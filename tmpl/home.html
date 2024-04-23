@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forum</title>
     <link rel="stylesheet" href="../static/style.css" />
-    <link rel="stylesheet" href="../static/login.css">
+    <link rel="stylesheet" href="../static/login.css" />
     <link rel="icon" href="../img/icon.jpg" />
   </head>
   <body>
@@ -26,7 +26,7 @@
         </div>
         <div id="navButton" class="nav-button">
           <div class="anim-layer"></div>
-          <a href="#">Sign Up</a>
+          <a href="#" id="login">Sign Up</a>
         </div>
         <div id="hamburger-menu">&#9776;</div>
       </div>
@@ -50,7 +50,7 @@
     </header>
 
     <!-- login -->
-    <div id="login-form" style="display: none">
+    <div id="login-form" class="login-active" style="display: none">
       <div class="container" id="container">
         <div class="form-container sign-up-container">
           <form action="#">
@@ -89,14 +89,14 @@
         <div class="overlay-container">
           <div class="overlay">
             <div class="overlay-panel overlay-left">
-              <h1>Welcome Back!</h1>
+              <h1>Welcome Back !</h1>
               <p>
                 To keep connected with us please login with your personal info
               </p>
               <button class="ghost" id="signIn">Sign In</button>
             </div>
             <div class="overlay-panel overlay-right">
-              <h1>Hello, Friend!</h1>
+              <h1>Hello, Friend !</h1>
               <p>Enter your personal details and start journey with us</p>
               <button class="ghost" id="signUp">Sign Up</button>
             </div>
@@ -109,14 +109,18 @@
   </body>
 
   <script>
-    var getHubergerIcon = document.getElementById("hamburger-menu");
-    var getHubergerCrossIcon = document.getElementById("hamburger-cross");
-    var getMobileMenu = document.getElementById("mobile-menu");
-    var loginForm = document.getElementById("login-form");
-    var loginButton = document.getElementById("navButton");
+    const getHubergerIcon = document.getElementById("hamburger-menu");
+    const getHubergerCrossIcon = document.getElementById("hamburger-cross");
+    const getMobileMenu = document.getElementById("mobile-menu");
+    const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("navButton");
+    const login = document.getElementById("login");
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");
     const container = document.getElementById("container");
+  
+
+    let loginActive = false;
 
     getHubergerIcon.addEventListener("click", function () {
       getMobileMenu.style.display = "flex";
@@ -138,17 +142,29 @@
       }
     });
 
+    // display the login form
     loginButton.addEventListener("click", function () {
-      loginForm.style.display = "block";
-      loginForm.classList.add("login-active");
+      if(!loginActive) {
+        loginForm.style.display = "block";
+        loginActive = true;
+      }
     });
 
+    // switch between the 2 panels
     signUpButton.addEventListener("click", () => {
       container.classList.add("right-panel-active");
     });
-
     signInButton.addEventListener("click", () => {
       container.classList.remove("right-panel-active");
+    });
+
+    // remove the login form by clicking outside of it
+    document.addEventListener("click", function (e) {
+      if(e.target == login) return
+      if (!loginForm.contains(e.target) && loginActive) {
+        loginForm.style.display = "none";
+        loginActive = false;
+      }
     });
   </script>
 </html>
