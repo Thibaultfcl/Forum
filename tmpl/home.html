@@ -49,6 +49,8 @@
       </div>
     </header>
 
+    <div class="overlay" id="overlay" style="display: none;"></div>
+
     <!-- login -->
     <div id="login-form" class="login-active" style="display: none">
       <div class="container" id="container">
@@ -152,6 +154,7 @@
       }, 300);
       if (!loginActive) {
         loginForm.style.display = "block";
+        document.getElementById("overlay").style.display = "block";
         loginActive = true;
       }
     });
@@ -166,6 +169,7 @@
     loginButton.addEventListener("click", function () {
       if (!loginActive) {
         loginForm.style.display = "block";
+        document.getElementById("overlay").style.display = "block";
         loginActive = true;
       }
     });
@@ -183,6 +187,7 @@
       if (e.target == login || e.target == loginMobile) return;
       if (!loginForm.contains(e.target) && loginActive) {
         loginForm.style.display = "none";
+        document.getElementById("overlay").style.display = "none";
         loginActive = false;
       }
     });

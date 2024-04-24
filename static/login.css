@@ -2,6 +2,7 @@
 
 .login-active * {
 	box-sizing: border-box;
+	z-index: 1000;
 }
 
 .login-active h1 {
