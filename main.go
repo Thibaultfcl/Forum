@@ -16,10 +16,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "tmpl/home.html")
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "tmpl/login.html")
-}
-
 // function that creat a table User
 func createTableUser(db *sql.DB) {
 	//creating the user table if not already created
@@ -48,7 +44,6 @@ func main() {
 	defer db.Close()
 
 	http.HandleFunc("/home", Home)
-	http.HandleFunc("/login", Login)
 
 	//load the CSS and the images
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))

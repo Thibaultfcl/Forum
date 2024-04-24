@@ -216,3 +216,28 @@
 	height: 40px;
 	width: 40px;
 }
+
+@media only screen and (max-width: 770px) {
+	.login-active .social-container {
+		display: none;
+	}
+	.social-text {
+		display: none;
+	}
+	.login-active h1 {
+		font-size: 22px;
+		margin-bottom: 10px;
+	}
+	.login-active input {
+		width: 150%;
+	}
+	.login-active button {
+		width: 170%;
+	}
+	.login-active button.ghost {
+		width: 140%;
+	}
+	.login-active .container {
+		min-height: 380px;
+	}
+}
