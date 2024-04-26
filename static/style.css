@@ -4,6 +4,13 @@ body {
     padding: 0px;
     margin: 0px;
     font-family: 'Montserrat', sans-serif;
+    background-color: #181818;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
 }
 
 .overlay {
@@ -20,7 +27,7 @@ body {
     position: relative;
     display: flex;
     padding: 10px;
-    background-color: #141214;
+    background-color: #212121;
     justify-content: space-around;
     align-items: center;
     box-shadow: 7px 5px 15px -4px rgba(0, 0, 0, 0.75);
@@ -38,7 +45,7 @@ body {
 }
 
 .nav-items > ul > li > a {
-    color: white;
+    color: #FFFFFF;
     text-decoration: none;
     font-weight: 500;
 }
@@ -62,7 +69,7 @@ body {
 
 .nav-logo a,
 .nav-button a {
-    color: white;
+    color: #FFFFFF;
     list-style: none;
     text-decoration: none;
     display: flex;
@@ -88,7 +95,7 @@ body {
     left: 50%;
     width: 0;
     height: 100%;
-    background-color: white;
+    background-color: #FFFFFF;
     transition: width 0.3s ease, left 0.3s ease;
 }
 
@@ -104,7 +111,7 @@ body {
 .nav-button a {
     display: block;
     padding: 10px 20px;
-    color: white;
+    color: #FFFFFF;
     text-decoration: none;
     position: relative;
     z-index: 1;
@@ -145,7 +152,7 @@ body {
     }
 
     .mobile-nav-items > ul > li > a {
-        color: white;
+        color: #FFFFFF;
         text-decoration: none;
     }
 
@@ -154,7 +161,7 @@ body {
         position: absolute;
         width: 100%;
         height: 0.17rem;
-        background-color: white;
+        background-color: #FFFFFF;
         left: 0;
         bottom: 0;
         transform-origin: 0% 100%;
@@ -181,7 +188,7 @@ body {
         left: 50%;
         width: 0;
         height: 100%;
-        background-color: white;
+        background-color: #FFFFFF;
         transition: width 0.3s ease, left 0.3s ease;
     }
 
@@ -197,7 +204,7 @@ body {
     .mobile-nav-button a {
         display: block;
         padding: 10px 20px;
-        color: white;
+        color: #FFFFFF;
         text-decoration: none;
         position: relative;
         z-index: 1;
@@ -210,7 +217,7 @@ body {
 
     #hamburger-cross {
         display: block;
-        color: white;
+        color: #FFFFFF;
         cursor: pointer;
         font-size: 40px;
         position: absolute;
@@ -220,8 +227,127 @@ body {
 
     #hamburger-menu {
         display: block;
-        color: white;
+        color: #FFFFFF;
         cursor: pointer;
         font-size: 24px;
     }
+    .trend {
+        display: none;
+    }
+}
+
+.trend {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: #212121;
+    padding: 20px;
+    text-align: center;
+    color: #FFFFFF;
+    box-shadow: -15px 0px 17px -18px rgba(0,0,0,0.5);
+}
+
+.trend h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.trend ol {
+    list-style-type: none;
+    padding: 0;
+    display: inline-block;
+    text-align: left;
+}
+
+.trend li {
+    margin-bottom: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.trend li:hover {
+    background-color: #3D3D3D;
+}
+
+.followers {
+    color: #AAAAAA;
+    font-size: 14px;
+}
+
+.card {
+    position: relative;
+    top: 120px;
+    left: 5%;
+    max-width: 960px;
+    border-radius: 20px;
+    background: #212121;
+    overflow: hidden;
+    padding: 14px;
+    position: relative;
+}
+
+.card header.user {
+    display: flex;
+    gap: 12px;
+}
+
+.card header.user img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card header .user-info-name {
+    letter-spacing: 0.4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.card header .user-info-time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.588);
+}
+
+.card main p {
+    font-size: 14px;
+    color: #fff;
+    margin-top: 16px;
+    line-height: 1.7;
+}
+
+.card section {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.card section .users-avatars {
+    margin-right: 21px;
+    display: flex;
+    align-items: center;
+}
+
+.card section .users-avatars img {
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #191a1d;
+    margin-right: -15px;
+}
+
+.card section p {
+    color: rgba(255, 255, 255, 0.508);
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.card section p.comment {
+    margin-left: auto;
 }

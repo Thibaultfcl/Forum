@@ -10,7 +10,7 @@
   </head>
   <body>
     <!-- navbar -->
-    <header>
+    <header class="sticky">
       <div class="navbar">
         <div class="nav-logo">
           <a href="#">FORUM</a>
@@ -49,13 +49,14 @@
       </div>
     </header>
 
-    <div class="overlay" id="overlay" style="display: none;"></div>
+    <!-- login bg -->
+    <div id="overlay" class="overlay" style="display: none"></div>
 
     <!-- login -->
     <div id="login-form" class="login-active" style="display: none">
       <div class="container" id="container">
         <div class="form-container sign-up-container">
-          <form action="#">
+          <form action="/signup" method="post">
             <h1>Create Account</h1>
             <div class="social-container">
               <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -65,14 +66,14 @@
               <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
             </div>
             <span class="social-text">or use your email for registration</span>
-            <input type="text" placeholder="Name" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
+            <input type="text" id="username" name="username" placeholder="Name" required autocomplete="off"/>
+            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="off"/>
+            <input type="password" id="password" name="password" placeholder="Password" required autocomplete="off"/>
             <button>Sign Up</button>
           </form>
         </div>
         <div class="form-container sign-in-container">
-          <form action="#">
+          <form action="/signin" method="post">
             <h1>Sign in</h1>
             <div class="social-container">
               <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -82,8 +83,8 @@
               <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
             </div>
             <span class="social-text">or use your account</span>
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
+            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="off"/>
+            <input type="password" id="password" name="password" placeholder="Password" required autocomplete="off"/>
             <a href="#">Forgot your password?</a>
             <button>Sign In</button>
           </form>
@@ -105,6 +106,62 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- trending categories -->
+    <div id="trend" class="trend">
+      <h2>Trending Categories</h2>
+      <ol>
+        <li>Category<span class="followers"> (30 followers)</span></li>
+        <li>Category<span class="followers"> (25 followers)</span></li>
+        <li>Category<span class="followers"> (18 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+      </ol>
+      <h2>Categories Followed</h2>
+      <ol>
+        <li>Category<span class="followers"> (30 followers)</span></li>
+        <li>Category<span class="followers"> (25 followers)</span></li>
+        <li>Category<span class="followers"> (18 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+      </ol>
+    </div>
+
+    <!-- post card -->
+    <div class="card">
+      <div class="ovelay"></div>
+      <header class="user">
+        <img
+          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+        />
+        <div class="user-info">
+          <h2 class="user-info-name">Dadda Hicham</h2>
+          <p class="user-info-time">4 min ago</p>
+        </div>
+      </header>
+      <main>
+        <p>
+          We are facing a serious business dilemma, with Facebook taking away a
+          good chunk of traffic to news and content sites, and ad blockers .
+        </p>
+      </main>
+      <section>
+        <div class="users-avatars">
+          <img
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          />
+        </div>
+        <p>40 Likes</p>
+        <p class="comment">10 comment</p>
+        <p>5 shared</p>
+      </section>
     </div>
 
     <footer></footer>
