@@ -17,25 +17,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "tmpl/home.html")
 }
 
-// function that creat a table User
-func createTableUser(db *sql.DB) {
-	//creating the user table if not already created
-	_, err := db.Exec(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username VARCHAR(12) NOT NULL,
-            password VARCHAR(12) NOT NULL,
-			email TEXT NOT NULL,
-			isAdmin BOOL NOT NULL DEFAULT FALSE,
-			isBanned BOOL NOT NULL DEFAULT FALSE,
-			pp BLOB
-        )
-    `)
-	if err != nil {
-		panic(err.Error())
-	}
-}
-
 func main() {
 	//open the database with sqlite3
 	db, err := sql.Open("sqlite3", "database.db")
@@ -43,7 +24,7 @@ func main() {
 		panic(err.Error())
 	}
 	//creat the 2 tables
-	createTableUser(db)
+	functions.CreateTableUser(db)
 	defer db.Close()
 
 	//handle the different pages
