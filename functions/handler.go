@@ -17,25 +17,18 @@ type UserData struct {
 func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
 
-	//check if the token is empty
-	if token == "" {
-		http.ServeFile(w, r, "tmpl/home.html")
-		return
-	}
+	fmt.Println("token: ", token)
 
-	//check if the user is connected
-	row := db.QueryRow("SELECT * FROM users WHERE UUID=?", token)
-	var id int
-	var username, password, email string
-	var isAdmin, isBanned bool
+	//get the user data from the database
+    row := db.QueryRow("SELECT isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
+    var isAdmin, isBanned bool
 	var pp []byte
-	var storedToken string
 
 	//scan and get the data
-	err := row.Scan(&id, &username, &password, &email, &isAdmin, &isBanned, &pp, &storedToken)
+	err := row.Scan(&isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			http.ServeFile(w, r, "tmpl/home.html")
+			serveHomePage(w, false, "")
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -43,25 +36,22 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	}
 
-	userData := UserData{IsLoggedIn: true}
-
-	var profilePicture string
+	profilePicture := ""
 	if pp != nil {
 		profilePicture = "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(pp)
 	}
 
-	userData.ProfilePicture = profilePicture
+	serveHomePage(w, true, profilePicture)
+}
 
-	//parse the template
-	tmpl, err := template.ParseFiles("tmpl/home.html")
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	//execute the template
-	if err := tmpl.Execute(w, userData); err != nil {
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return
-	}
+func serveHomePage(w http.ResponseWriter, isLoggedIn bool, pp string) {
+    userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp}
+    tmpl, err := template.ParseFiles("tmpl/home.html")
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+        return
+    }
+    if err := tmpl.Execute(w, userData); err != nil {
+        http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+    }
 }

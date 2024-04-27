@@ -24,22 +24,21 @@ func Signup(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	password := r.FormValue("password")
 
 	//request SQL to check if the user already exist
-	row := db.QueryRow("SELECT * FROM users WHERE username=?", username)
+	row := db.QueryRow("SELECT id FROM users WHERE username=?", username)
 	var id int
-	var storedUsername, storedPassword, storedEmail string
-	var isAdmin, isBanned bool
 
 	//we scan to get the data
-	err := row.Scan(&id, &storedUsername, &storedPassword, &storedEmail, &isAdmin, &isBanned)
+	err := row.Scan(&id)
 
 	//we check if the username is already used
-	if err == nil {
-		fmt.Fprintln(w, "This username already exist, please select another one")
-		return
-	} else if err != sql.ErrNoRows {
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return
-	}
+	if err != sql.ErrNoRows {
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+        } else {
+            fmt.Fprintln(w, "This username already exist, please select another one")
+        }
+        return
+    }
 
 	//hash the password
 	password, err = HashPassword(password)
@@ -96,15 +95,11 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	password := r.FormValue("password")
 
 	//request SQL to get the user
-	row := db.QueryRow("SELECT * FROM users WHERE email=?", email)
-	var id int
-	var storedUsername, storedPassword, storedEmail string
-	var isAdmin, isBanned bool
-	var pp []byte
-	var token string
+	row := db.QueryRow("SELECT password FROM users WHERE email=?", email)
+	var storedPassword string
 
 	//scan and get the data
-	err := row.Scan(&id, &storedUsername, &storedPassword, &storedEmail, &isAdmin, &isBanned, &pp, &token)
+	err := row.Scan(&storedPassword)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Fprintln(w, "User not found")
@@ -121,7 +116,7 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	//generate a session token
-	token, err = GenerateSessionToken()
+	token, err := GenerateSessionToken()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
@@ -143,8 +138,13 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 // function that handle the logout
 func Logout(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
+	newToken, err := GenerateSessionToken()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return
+	}
 
-	_, err := db.Exec("UPDATE users SET UUID = '' WHERE UUID = ?", token)
+	_, err = db.Exec("UPDATE users SET UUID = ? WHERE UUID = ?", newToken, token)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
