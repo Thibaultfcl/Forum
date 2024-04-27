@@ -13,7 +13,8 @@ func CreateTableUser(db *sql.DB) {
 			email TEXT NOT NULL,
 			isAdmin BOOL NOT NULL DEFAULT FALSE,
 			isBanned BOOL NOT NULL DEFAULT FALSE,
-			pp BLOB
+			pp BLOB,
+			UUID VARCHAR(36) NOT NULL
         )
     `)
 	if err != nil {

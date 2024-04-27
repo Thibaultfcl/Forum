@@ -16,6 +16,7 @@ func GenerateSessionToken() (string, error) {
 	return sessionID.String(), nil
 }
 
+// function that set the session token
 func SetSessionToken(token string, w http.ResponseWriter) {
 	cookie := http.Cookie{
 		Name:     "session-token",
@@ -26,6 +27,7 @@ func SetSessionToken(token string, w http.ResponseWriter) {
 	http.SetCookie(w, &cookie)
 }
 
+// function that get the session token
 func GetSessionToken(r *http.Request) string {
 	cookie, err := r.Cookie("session-token")
 	if err != nil {
@@ -34,6 +36,7 @@ func GetSessionToken(r *http.Request) string {
 	return cookie.Value
 }
 
+// function that clear the session token
 func ClearSessionToken(w http.ResponseWriter) {
 	cookie := http.Cookie{
 		Name:     "session-token",

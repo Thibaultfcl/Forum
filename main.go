@@ -12,11 +12,6 @@ import (
 // port of the server
 const port = ":8080"
 
-// home page
-func Home(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "tmpl/home.html")
-}
-
 func main() {
 	//open the database with sqlite3
 	db, err := sql.Open("sqlite3", "database.db")
@@ -28,9 +23,10 @@ func main() {
 	defer db.Close()
 
 	//handle the different pages
-	http.HandleFunc("/home", Home)
+	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) { functions.Home(w, r, db) })
 	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) { functions.Signin(w, r, db) })
 	http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) { functions.Signup(w, r, db) })
+	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) { functions.Logout(w, r, db) })
 
 	//load the CSS and the images
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
