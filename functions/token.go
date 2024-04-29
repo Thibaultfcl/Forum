@@ -23,6 +23,7 @@ func SetSessionToken(token string, w http.ResponseWriter) {
 		Value:    token,
 		HttpOnly: true,
 		Secure:   true,
+		Expires: time.Now().AddDate(0, 0, 1),
 	}
 	http.SetCookie(w, &cookie)
 }

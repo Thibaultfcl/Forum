@@ -3,7 +3,7 @@ package functions
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -24,21 +24,21 @@ func Signup(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	password := r.FormValue("password")
 
 	//request SQL to check if the user already exist
-	row := db.QueryRow("SELECT id FROM users WHERE username=?", username)
+	row := db.QueryRow("SELECT id FROM users WHERE email=?", email)
 	var id int
 
 	//we scan to get the data
 	err := row.Scan(&id)
 
-	//we check if the username is already used
+	//we check if the email is already used
 	if err != sql.ErrNoRows {
-        if err != nil {
-            http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-        } else {
-            fmt.Fprintln(w, "This username already exist, please select another one")
-        }
-        return
-    }
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		} else {
+			fmt.Fprintln(w, "This email has already been used, please select another one")
+		}
+		return
+	}
 
 	//hash the password
 	password, err = HashPassword(password)
@@ -56,7 +56,7 @@ func Signup(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	defer file.Close()
 
 	//read the image
-	ppDefault, err := ioutil.ReadAll(file)
+	ppDefault, err := io.ReadAll(file)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error reading image: %v", err), http.StatusInternalServerError)
 		return

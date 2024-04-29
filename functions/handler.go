@@ -36,9 +36,9 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	}
 
-	profilePicture := ""
+	var profilePicture string
 	if pp != nil {
-		profilePicture = "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(pp)
+		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
 	serveHomePage(w, true, profilePicture)

@@ -56,3 +56,9 @@ func CreateTablePost(db *sql.DB) {
 		panic(err.Error())
 	}
 }
+
+func CreateTable(db *sql.DB) {
+	CreateTableUser(db)
+	CreateTableCategories(db)
+	CreateTablePost(db)
+}

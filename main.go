@@ -19,11 +19,12 @@ func main() {
 		panic(err.Error())
 	}
 	//creat the 2 tables
-	functions.CreateTableUser(db)
+	functions.CreateTable(db)
 	defer db.Close()
 
 	//handle the different pages
 	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) { functions.Home(w, r, db) })
+	http.HandleFunc("/createPost", func(w http.ResponseWriter, r *http.Request) { functions.CreatePost(w, r, db) })
 	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) { functions.Signin(w, r, db) })
 	http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) { functions.Signup(w, r, db) })
 	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) { functions.Logout(w, r, db) })
