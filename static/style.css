@@ -419,7 +419,6 @@ body {
     transform: translate(2px ,2px);
 }
 
-
 .icon-btn {
     width: 50px;
     height: 50px;
@@ -469,6 +468,7 @@ body {
 .btn-txt {
     opacity: 0;
     transition: opacity 0.2s;
+    font-weight: bold;
 }
 
 .add-btn:hover::before,
@@ -529,8 +529,13 @@ body {
     scale: 1.1;
 }
 
-.post-form {
+.post-form * {
     z-index: 1000;
+    color: #FFFFFF;
+}
+
+.post-form textarea {
+    color: black;
 }
 
 .post-form .button {
@@ -546,7 +551,6 @@ body {
 	top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -557,14 +561,14 @@ body {
     flex-direction: column;
     width: 100%;
     max-width: 500px;
-    background-color: #fff;
-    box-shadow: 0 15px 30px 0 rgba(0, 125, 171, 0.15);
+    background-color: #212121;
+    box-shadow: 0 15px 30px 0 rgba(155, 0, 0, 0.15);
     border-radius: 10px;
 }
 
 .post-form .modal__header {
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #c52726;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -590,20 +594,9 @@ body {
     transition: 0.15s ease;
 }
 
-.post-form .button--icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    background-color: transparent;
-    border-radius: 0.25rem;
-}
-
-.post-form .button--icon:focus, .button--icon:hover {
-    background-color: #ededed;
-}
-
 .post-form .button--primary {
     background-color: #c52726;
-    color: #FFF;
+    color: #FFFFFF;
     padding: 0.75rem 1.25rem;
     border-radius: 0.25rem;
     font-weight: 500;
@@ -635,6 +628,7 @@ body {
     border-radius: 0.25rem;
     padding: 0.75rem 0.75rem;
     transition: 0.15s ease;
+    color: black;
 }
 
 .post-form .input__field:focus {
@@ -651,5 +645,5 @@ body {
 .post-form .input__description {
     font-size: 0.875rem;
     margin-top: 0.5rem;
-    color: #8d8d8d;
+    color: #AAAAAA;
 }
