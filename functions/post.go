@@ -12,10 +12,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	//we get the title and the content
-	title := r.FormValue("title")
-	content := r.FormValue("content")
-
 	//we get the token
 	token := GetSessionToken(r)
 
@@ -30,8 +26,13 @@ func CreatePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	//we get the title and the content
+	category := r.FormValue("Category")
+	title := r.FormValue("PostName")
+	content := r.FormValue("PostContent")
+
 	//we insert the post in the database
-	_, err = db.Exec("INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)", title, content, id)
+	_, err = db.Exec("INSERT INTO posts (title, content, category ,author) VALUES (?, ?, ?, ?)", title, content, category, id)
 	if err != nil {
 		http.Error(w, "Error while creating the post", http.StatusInternalServerError)
 		return

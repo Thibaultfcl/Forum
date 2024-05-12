@@ -217,6 +217,7 @@
       </section>
     </div>
 
+    {{if .IsLoggedIn}}
     <!-- post btn -->
     <div id="newPost">
       <button class="icon-btn add-btn">
@@ -224,10 +225,11 @@
         <div id="newPostTxt" class="btn-txt">NEW POST</div>
       </button>
     </div>
+    {{end}}
 
     <!-- post form -->
     <div id="post-form" class="post-form" style="display: none">
-      <form action="#" method="post">
+      <form action="/createPost" method="post">
         <div class="container">
           <div class="modal">
             <div class="modal__header">
@@ -235,8 +237,31 @@
             </div>
             <div class="modal__body">
               <div class="input">
+                <label class="input__label">Category</label>
+                <input
+                  class="input__field"
+                  type="text"
+                  id="Category"
+                  name="Category"
+                  required
+                  autocomplete="on"
+                  autofocus
+                />
+                <p class="input__description">
+                  Please select the category that corresponds to your post
+                </p>
+              </div>
+              <div class="input">
                 <label class="input__label">Post title</label>
-                <input class="input__field" type="text" />
+                <input
+                  class="input__field"
+                  type="text"
+                  id="PostName"
+                  name="PostName"
+                  required
+                  autocomplete="off"
+                  autofocus
+                />
                 <p class="input__description">
                   The title must contain a maximum of 32 characters
                 </p>
@@ -245,10 +270,14 @@
                 <label class="input__label">Content</label>
                 <textarea
                   class="input__field input__field--textarea"
+                  id="PostContent"
+                  name="PostContent"
+                  required
+                  autocomplete="off"
                 ></textarea>
                 <p class="input__description">
-                  Give your post a good description so everyone know what's
-                  it for
+                  Give your post a good description so everyone know what's it
+                  for
                 </p>
               </div>
             </div>
@@ -267,22 +296,7 @@
     const getHubergerIcon = document.getElementById("hamburger-menu");
     const getHubergerCrossIcon = document.getElementById("hamburger-cross");
     const getMobileMenu = document.getElementById("mobile-menu");
-    const loginForm = document.getElementById("login-form");
-    const loginButton = document.getElementById("navButton");
-    const loginButtonMobile = document.getElementById("navButtonMobile");
-    const login = document.getElementById("login");
-    const loginMobile = document.getElementById("loginMobile");
-    const signUpButton = document.getElementById("signUp");
-    const signInButton = document.getElementById("signIn");
-    const container = document.getElementById("container");
     const mobileNavItems = document.getElementById("mobile-nav-items");
-
-    const newPost = document.getElementById("newPost");
-    const postForm = document.getElementById("post-form");
-    const crossBtn = document.getElementById("crossBtn");
-
-    let loginActive = false;
-    let postActive = false;
 
     getHubergerIcon.addEventListener("click", function () {
       getMobileMenu.style.display = "flex";
@@ -305,6 +319,25 @@
       }, 300);
     });
 
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 770) {
+        getMobileMenu.style.display = "none";
+      }
+    });
+
+
+    const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("navButton");
+    const loginButtonMobile = document.getElementById("navButtonMobile");
+    const login = document.getElementById("login");
+    const loginMobile = document.getElementById("loginMobile");
+    const signUpButton = document.getElementById("signUp");
+    const signInButton = document.getElementById("signIn");
+    const container = document.getElementById("container");
+    const overlay = document.getElementById("overlay");
+    let loginActive = false;
+
+    // display the login form for mobile
     loginButtonMobile.addEventListener("click", function () {
       getMobileMenu.style.transform = "translateX(-100%)";
       setTimeout(function () {
@@ -317,20 +350,16 @@
       }
     });
 
-    window.addEventListener("resize", function () {
-      if (window.innerWidth > 770) {
-        getMobileMenu.style.display = "none";
-      }
-    });
-
     // display the login form
-    loginButton.addEventListener("click", function () {
-      if (!loginActive) {
-        loginForm.style.display = "block";
-        document.getElementById("overlay").style.display = "block";
-        loginActive = true;
-      }
-    });
+    if(loginButton != null) {
+      loginButton.addEventListener("click", function () {
+        if (!loginActive) {
+          loginForm.style.display = "block";
+          document.getElementById("overlay").style.display = "block";
+          loginActive = true;
+        }
+      });
+    }
 
     // switch between the 2 panels
     signUpButton.addEventListener("click", () => {
@@ -341,28 +370,33 @@
     });
 
     // remove the login form by clicking outside of it
-    document.addEventListener("click", function (e) {
-      if (e.target == login || e.target == loginMobile) return;
-      if (!loginForm.contains(e.target) && loginActive) {
+    overlay.addEventListener("click", function (e) {
+      if (loginActive) {
         loginForm.style.display = "none";
-        document.getElementById("overlay").style.display = "none";
+        overlay.style.display = "none";
         loginActive = false;
       }
     });
 
+    const newPost = document.getElementById("newPost");
+    const postForm = document.getElementById("post-form");
+    let postActive = false;
+
     // display the post form
     newPost.addEventListener("click", function (e) {
-      postForm.style.display = "block";
-      document.getElementById("overlay").style.display = "block";
-      postActive = true;
+      console.log("clicked");
+      if (!postActive) {
+        postForm.style.display = "block";
+        overlay.style.display = "block";
+        postActive = true;
+      }
     });
 
-    // remove the post form by clicking on the cross button
-    document.addEventListener("click", function (e) {
-      if (e.target == document.getElementById("newPostTxt") || e.target == login || e.target == loginMobile) return;
-      if (!postForm.contains(e.target) && postActive) {
+    // remove the post form by clicking outside of it
+    overlay.addEventListener("click", function (e) {
+      if (postActive) {
         postForm.style.display = "none";
-        document.getElementById("overlay").style.display = "none";
+        overlay.style.display = "none";
         postActive = false;
       }
     });
