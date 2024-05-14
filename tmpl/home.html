@@ -243,10 +243,16 @@
                   type="text"
                   id="Category"
                   name="Category"
+                  list="categories"
                   required
-                  autocomplete="on"
+                  autocomplete="off"
                   autofocus
                 />
+                <datalist id="categories">
+                  {{range .Categories}}
+                  <option value="{{.}}"></option>
+                  {{end}}
+                </datalist>
                 <p class="input__description">
                   Please select the category that corresponds to your post
                 </p>
@@ -325,7 +331,6 @@
       }
     });
 
-
     const loginForm = document.getElementById("login-form");
     const loginButton = document.getElementById("navButton");
     const loginButtonMobile = document.getElementById("navButtonMobile");
@@ -351,7 +356,7 @@
     });
 
     // display the login form
-    if(loginButton != null) {
+    if (loginButton != null) {
       loginButton.addEventListener("click", function () {
         if (!loginActive) {
           loginForm.style.display = "block";

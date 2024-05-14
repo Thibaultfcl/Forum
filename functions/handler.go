@@ -11,6 +11,7 @@ import (
 type UserData struct {
 	IsLoggedIn bool
 	ProfilePicture string
+	Categories []string
 }
 
 // home page
@@ -28,7 +29,7 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err := row.Scan(&isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			serveHomePage(w, false, "")
+			serveHomePage(w, false, "", nil)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -41,11 +42,23 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	serveHomePage(w, true, profilePicture)
+	var categories []string
+	rows, _ := db.Query("SELECT name FROM categories")
+	for rows.Next() {
+		var category string
+		err := rows.Scan(&category)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return
+		}
+		categories = append(categories, category)
+	}
+
+	serveHomePage(w, true, profilePicture, categories)
 }
 
-func serveHomePage(w http.ResponseWriter, isLoggedIn bool, pp string) {
-    userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp}
+func serveHomePage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []string) {
+    userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories}
     tmpl, err := template.ParseFiles("tmpl/home.html")
     if err != nil {
         http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
