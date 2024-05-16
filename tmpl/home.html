@@ -25,8 +25,10 @@
           </ul>
         </div>
         {{if .IsLoggedIn}}
-        <form action="/profil" method="post">
-          <img class="pp" src="data:image/jpeg;base64,{{.ProfilePicture}}" />
+        <form action="/profile" method="post">
+          <button type="submit" style="background: none; border: none;">
+            <img class="pp" src="data:image/jpeg;base64,{{.ProfilePicture}}" />
+          </button>
         </form>
         <form action="/logout" method="post">
           <button class="logout">
@@ -182,24 +184,23 @@
     </div>
 
     <!-- post card -->
+    {{range .Posts}}
     <div class="card">
       <div class="ovelay"></div>
       <header class="user">
         <img
-          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          src="data:image/jpeg;base64,{{.AuthorPicture}}"
         />
         <div class="user-info">
-          <h2 class="user-info-name">Dadda Hicham</h2>
-          <p class="user-info-time">4 min ago</p>
+          <h2 class="user-info-name">{{.Author}}</h2>
+          <p class="user-info-time">{{.TimePosted}}</p>
         </div>
+        <h3>{{.Category}} - {{.Title}}</h3>
       </header>
       <main>
-        <p>
-          We are facing a serious business dilemma, with Facebook taking away a
-          good chunk of traffic to news and content sites, and ad blockers .
-        </p>
+        <p>{{.Content}}</p>
       </main>
-      <section>
+      <!-- <section>
         <div class="users-avatars">
           <img
             src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
@@ -214,8 +215,9 @@
         <p>40 Likes</p>
         <p class="comment">10 comment</p>
         <p>5 shared</p>
-      </section>
+      </section> -->
     </div>
+    {{end}}
 
     {{if .IsLoggedIn}}
     <!-- post btn -->

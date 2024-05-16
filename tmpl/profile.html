@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum</title>
+    <link rel="stylesheet" href="../static/style.css" />
+    <link rel="icon" href="../img/icon.jpg" />
+  </head>
+  <body>
+    <!-- navbar -->
+    <header class="sticky">
+      <div class="navbar">
+        <div class="nav-logo">
+          <a href="#">FORUM</a>
+        </div>
+        <div class="nav-items">
+          <ul>
+            <li><a href="#"> Home </a></li>
+            <li><a href="#"> Services </a></li>
+            <li><a href="#"> About </a></li>
+            <li><a href="#"> Contact </a></li>
+            <li><a href="#"> Home </a></li>
+          </ul>
+        </div>
+        <form action="/profil" method="post">
+          <img class="pp" src="data:image/jpeg;base64,{{.ProfilePicture}}" />
+        </form>
+        <form action="/logout" method="post">
+          <button class="logout">
+            <div class="sign">
+              <svg viewBox="0 0 512 512">
+                <path
+                  d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                ></path>
+              </svg>
+            </div>
+            <div class="text">Logout</div>
+          </button>
+        </form>
+        <div id="hamburger-menu">&#9776;</div>
+      </div>
+
+      <div id="mobile-menu">
+        <div id="mobile-nav-items" class="mobile-nav-items">
+          <ul>
+            <li><a href="#"> Home </a></li>
+            <li><a href="#"> Services </a></li>
+            <li><a href="#"> About </a></li>
+            <li><a href="#"> Contact </a></li>
+            <li><a href="#"> Home </a></li>
+          </ul>
+        </div>
+        <div id="navButtonMobile" class="mobile-nav-button">
+          <div class="anim-layer"></div>
+          <a href="#" id="loginMobile">Sign Up</a>
+        </div>
+        <div id="hamburger-cross">&#10006;</div>
+      </div>
+    </header>
+
+    <!-- trending categories -->
+    <div id="trend" class="trend">
+      <h2>Trending Categories</h2>
+      <ol>
+        <li>Category<span class="followers"> (30 followers)</span></li>
+        <li>Category<span class="followers"> (25 followers)</span></li>
+        <li>Category<span class="followers"> (18 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+      </ol>
+      <h2>Categories Followed</h2>
+      <ol>
+        <li>Category<span class="followers"> (30 followers)</span></li>
+        <li>Category<span class="followers"> (25 followers)</span></li>
+        <li>Category<span class="followers"> (18 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+        <li>Category<span class="followers"> (12 followers)</span></li>
+      </ol>
+    </div>
+
+    <!-- post card -->
+    {{range .Posts}}
+    <div class="card">
+      <div class="ovelay"></div>
+      <header class="user">
+        <img
+          src="data:image/jpeg;base64,{{.AuthorPicture}}"
+        />
+        <div class="user-info">
+          <h2 class="user-info-name">{{.Author}}</h2>
+          <p class="user-info-time">{{.TimePosted}}</p>
+        </div>
+        <h3>{{.Category}} - {{.Title}}</h3>
+      </header>
+      <main>
+        <p>{{.Content}}</p>
+      </main>
+      <!-- <section>
+        <div class="users-avatars">
+          <img
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+          />
+        </div>
+        <p>40 Likes</p>
+        <p class="comment">10 comment</p>
+        <p>5 shared</p>
+      </section> -->
+    </div>
+    {{end}}
+
+    <footer></footer>
+  </body>
+
+  <script>
+    const getHubergerIcon = document.getElementById("hamburger-menu");
+    const getHubergerCrossIcon = document.getElementById("hamburger-cross");
+    const getMobileMenu = document.getElementById("mobile-menu");
+    const mobileNavItems = document.getElementById("mobile-nav-items");
+
+    getHubergerIcon.addEventListener("click", function () {
+      getMobileMenu.style.display = "flex";
+      setTimeout(function () {
+        getMobileMenu.style.transform = "translateX(0%)";
+      }, 50);
+    });
+
+    getHubergerCrossIcon.addEventListener("click", function () {
+      getMobileMenu.style.transform = "translateX(-100%)";
+      setTimeout(function () {
+        getMobileMenu.style.display = "none";
+      }, 300);
+    });
+
+    mobileNavItems.addEventListener("click", function () {
+      getMobileMenu.style.transform = "translateX(-100%)";
+      setTimeout(function () {
+        getMobileMenu.style.display = "none";
+      }, 300);
+    });
+
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 770) {
+        getMobileMenu.style.display = "none";
+      }
+    });
+  </script>
+</html>

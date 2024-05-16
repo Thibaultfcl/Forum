@@ -6,21 +6,23 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 )
 
 type UserData struct {
 	IsLoggedIn     bool
 	ProfilePicture string
 	Categories     []string
-	Posts		  []PostData
+	Posts          []PostData
 }
 
 type PostData struct {
-	Id       int
-	Title    string
-	Content  string
-	Category string
-	Author   string
+	Title         string
+	Content       string
+	Category      string
+	Author        string
+	AuthorPicture string
+	TimePosted    string
 }
 
 // home page
@@ -29,7 +31,6 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("token: ", token)
 
 	posts := getPosts(w, db)
-	fmt.Println("posts: ", posts)
 
 	//get the user data from the database
 	row := db.QueryRow("SELECT isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
@@ -70,15 +71,15 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func getPosts(w http.ResponseWriter, db *sql.DB) []PostData {
 	var posts []PostData
-	rows, err := db.Query(`SELECT id, title, content, date, category, author FROM posts ORDER BY date DESC`)
+	rows, err := db.Query(`SELECT title, content, date, category, author FROM posts ORDER BY date DESC`)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return nil
+		return posts
 	}
 	for rows.Next() {
-		var id, category, author int
+		var category, author int
 		var title, content, date string
-		err := rows.Scan(&id, &title, &content, &date, &category, &author)
+		err := rows.Scan(&title, &content, &date, &category, &author)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
@@ -96,7 +97,33 @@ func getPosts(w http.ResponseWriter, db *sql.DB) []PostData {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		posts = append(posts, PostData{Id: id, Title: title, Content: content, Category: categoryStr, Author: authorStr})
+		var authorPP []byte
+		row = db.QueryRow("SELECT pp FROM users WHERE id=?", author)
+		err = row.Scan(&authorPP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+
+		const layout = "2006-01-02T15:04:05Z07:00"
+		t, err := time.Parse(layout, date)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		t = t.Local()
+		elapsed := time.Since(t)
+		var elapsedStr string
+		if elapsed < time.Minute {
+		elapsedStr = fmt.Sprintf("%d seconds ago", int(elapsed.Seconds()))
+		} else if elapsed < time.Hour {
+			elapsedStr = fmt.Sprintf("%d minutes ago", int(elapsed.Minutes()))
+		} else if elapsed < time.Hour*24 {
+			elapsedStr = fmt.Sprintf("%d hours ago", int(elapsed.Hours()))
+		} else {
+			elapsedStr = fmt.Sprintf("%d days ago", int(elapsed.Hours()/24))
+		}
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr})
 	}
 	return posts
 }

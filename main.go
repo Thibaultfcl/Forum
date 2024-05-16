@@ -24,6 +24,7 @@ func main() {
 
 	//handle the different pages
 	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) { functions.Home(w, r, db) })
+	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { functions.Profile(w, r, db) })
 	http.HandleFunc("/createPost", func(w http.ResponseWriter, r *http.Request) { functions.CreatePost(w, r, db) })
 	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) { functions.Signin(w, r, db) })
 	http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) { functions.Signup(w, r, db) })

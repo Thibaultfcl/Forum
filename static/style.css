@@ -290,6 +290,7 @@ body {
     overflow: hidden;
     padding: 14px;
     position: relative;
+    color: #FFFFFF;
 }
 
 .card header.user {
