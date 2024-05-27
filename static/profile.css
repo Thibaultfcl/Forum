@@ -1,0 +1,137 @@
+.editProfile .form {
+    position: absolute;
+	top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    padding: 20px;
+    border-radius: 20px;
+    color: #fff;
+}
+
+.editProfile .title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    color: #c52726;
+}
+
+.editProfile .title::before {
+    width: 18px;
+    height: 18px;
+}
+
+.editProfile .title::after {
+    width: 18px;
+    height: 18px;
+    animation: pulse 1s linear infinite;
+}
+
+.editProfile .title::before,
+.editProfile .title::after {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    left: 0px;
+    background-color: #c52726;
+}
+
+.editProfile .signin {
+    font-size: 14.5px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.editProfile .signin {
+    text-align: center;
+}
+
+.editProfile .signin a:hover {
+    text-decoration: underline #c52726;
+}
+
+.editProfile .signin a {
+    color: #c52726;
+}
+
+.editProfile .flex {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+}
+
+.editProfile .form label {
+    position: relative;
+}
+
+.editProfile .form label .input {
+    background-color: #333;
+    color: #fff;
+    width: 100%;
+    padding: 20px 05px 05px 10px;
+    outline: 0;
+    border: 1px solid rgba(105, 105, 105, 0.397);
+    border-radius: 10px;
+}
+
+.editProfile .form label .input + span {
+    color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    font-size: 0.9em;
+    cursor: text;
+    transition: 0.3s ease;
+}
+
+.editProfile .form label .input:placeholder-shown + span {
+    top: 12.5px;
+    font-size: 0.9em;
+}
+
+.editProfile.form label .input:focus + span,
+.editProfile .form label .input:valid + span {
+    color: #c52726;
+    top: 0px;
+    font-size: 0.7em;
+    font-weight: 600;
+}
+
+.editProfile .input {
+    font-size: medium;
+}
+
+.editProfile .submit {
+    border: none;
+    outline: none;
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    transform: .3s ease;
+    background-color: #c52726;
+}
+
+.editProfile .submit:hover {
+    background-color: #c52726;
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(0.9);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(1.8);
+        opacity: 0;
+    }
+}
