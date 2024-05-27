@@ -197,3 +197,35 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int) []PostDat
 	}
 	return posts
 }
+
+func getCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
+	var categories []CategoryData
+	rows, _ := db.Query("SELECT name, number_of_posts FROM categories ORDER BY number_of_posts DESC LIMIT 5")
+	for rows.Next() {
+		var categoryName string
+		var categoryNbofP int
+		err := rows.Scan(&categoryName, &categoryNbofP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		categories = append(categories, CategoryData{Name: categoryName, NbofP: categoryNbofP})
+	}
+	return categories
+}
+
+func getAllCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
+	var categories []CategoryData
+	rows, _ := db.Query("SELECT name, number_of_posts FROM categories ORDER BY number_of_posts DESC")
+	for rows.Next() {
+		var categoryName string
+		var categoryNbofP int
+		err := rows.Scan(&categoryName, &categoryNbofP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		categories = append(categories, CategoryData{Name: categoryName, NbofP: categoryNbofP})
+	}
+	return categories
+}

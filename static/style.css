@@ -275,7 +275,7 @@ body {
     background-color: #3D3D3D;
 }
 
-.followers {
+.number_of_posts {
     color: #AAAAAA;
     font-size: 14px;
 }
@@ -291,6 +291,7 @@ body {
     padding: 14px;
     position: relative;
     color: #FFFFFF;
+    margin-bottom: 25px;
 }
 
 .card header.user {

@@ -167,19 +167,17 @@
     <div id="trend" class="trend">
       <h2>Trending Categories</h2>
       <ol>
-        <li>Category<span class="followers"> (30 followers)</span></li>
-        <li>Category<span class="followers"> (25 followers)</span></li>
-        <li>Category<span class="followers"> (18 followers)</span></li>
-        <li>Category<span class="followers"> (12 followers)</span></li>
-        <li>Category<span class="followers"> (12 followers)</span></li>
+        {{range .Categories}}
+        <li>{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></li>
+        {{end}}
       </ol>
       <h2>Categories Followed</h2>
       <ol>
-        <li>Category<span class="followers"> (30 followers)</span></li>
-        <li>Category<span class="followers"> (25 followers)</span></li>
-        <li>Category<span class="followers"> (18 followers)</span></li>
-        <li>Category<span class="followers"> (12 followers)</span></li>
-        <li>Category<span class="followers"> (12 followers)</span></li>
+        <li>Category<span class="number_of_posts"> (30 followers)</span></li>
+        <li>Category<span class="number_of_posts"> (25 followers)</span></li>
+        <li>Category<span class="number_of_posts"> (18 followers)</span></li>
+        <li>Category<span class="number_of_posts"> (12 followers)</span></li>
+        <li>Category<span class="number_of_posts"> (12 followers)</span></li>
       </ol>
     </div>
 
@@ -251,8 +249,8 @@
                   autofocus
                 />
                 <datalist id="categories">
-                  {{range .Categories}}
-                  <option value="{{.}}"></option>
+                  {{range .AllCategories}}
+                  <option value="{{.Name}}"></option>
                   {{end}}
                 </datalist>
                 <p class="input__description">
