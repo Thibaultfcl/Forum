@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forum</title>
     <link rel="stylesheet" href="../static/style.css" />
+    <link rel="stylesheet" href="../static/login.css" />
     <link rel="icon" href="../img/icon.jpg" />
   </head>
   <body>
@@ -23,8 +24,11 @@
             <li><a href="#"> Home </a></li>
           </ul>
         </div>
-        <form action="/profil" method="post">
-          <img class="pp" src="data:image/jpeg;base64,{{.ProfilePicture}}" />
+        {{if .IsLoggedIn}}
+        <form action="/profile" method="post">
+          <button type="submit" style="background: none; border: none">
+            <img class="pp" src="data:image/jpeg;base64,{{.ProfilePicture}}" />
+          </button>
         </form>
         <form action="/logout" method="post">
           <button class="logout">
@@ -38,6 +42,12 @@
             <div class="text">Logout</div>
           </button>
         </form>
+        {{else}}
+        <div id="navButton" class="nav-button">
+          <div class="anim-layer"></div>
+          <a href="#" id="login">Sign Up</a>
+        </div>
+        {{end}}
         <div id="hamburger-menu">&#9776;</div>
       </div>
 
@@ -59,12 +69,106 @@
       </div>
     </header>
 
+    <!-- login bg -->
+    <div id="overlay" class="overlay" style="display: none"></div>
+
+    <!-- login -->
+    <div id="login-form" class="login-active" style="display: none">
+      <div class="container" id="container">
+        <div class="form-container sign-up-container">
+          <form action="/signup" method="post">
+            <h1>Create Account</h1>
+            <div class="social-container">
+              <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social"
+                ><i class="fab fa-google-plus-g"></i
+              ></a>
+              <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <span class="social-text">or use your email for registration</span>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Name"
+              required
+              autocomplete="off"
+            />
+            <input
+              type="email"
+              id="emailSignup"
+              name="email"
+              placeholder="Email"
+              required
+              autocomplete="off"
+            />
+            <input
+              type="password"
+              id="passwordSignup"
+              name="password"
+              placeholder="Password"
+              required
+              autocomplete="off"
+            />
+            <button>Sign Up</button>
+          </form>
+        </div>
+        <div class="form-container sign-in-container">
+          <form action="/signin" method="post">
+            <h1>Sign in</h1>
+            <div class="social-container">
+              <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social"
+                ><i class="fab fa-google-plus-g"></i
+              ></a>
+              <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <span class="social-text">or use your account</span>
+            <input
+              type="email"
+              id="emailSignin"
+              name="email"
+              placeholder="Email"
+              required
+              autocomplete="off"
+            />
+            <input
+              type="password"
+              id="passwordSignin"
+              name="password"
+              placeholder="Password"
+              required
+              autocomplete="off"
+            />
+            <a href="#">Forgot your password?</a>
+            <button>Sign In</button>
+          </form>
+        </div>
+        <div class="overlay-container">
+          <div class="overlay">
+            <div class="overlay-panel overlay-left">
+              <h1>Welcome Back !</h1>
+              <p>
+                To keep connected with us please login with your personal info
+              </p>
+              <button class="ghost" id="signIn">Sign In</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+              <h1>Hello, Friend !</h1>
+              <p>Enter your personal details and start journey with us</p>
+              <button class="ghost" id="signUp">Sign Up</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- trending categories -->
     <div id="trend" class="trend">
       <h2>Trending Categories</h2>
       <ol>
         {{range .Categories}}
-        <li>{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></li>
+        <li><a href="/category/{{.Name}}">{{.Name}}</a><span class="number_of_posts"> ({{.NbofP}} posts)</span></li>
         {{end}}
       </ol>
       <h2>Categories Followed</h2>
@@ -76,8 +180,6 @@
         <li>Category<span class="number_of_posts"> (12 followers)</span></li>
       </ol>
     </div>
-
-    <h1>{{.Category}}</h1>
 
     <!-- post card -->
     {{range .Posts}}
@@ -115,6 +217,84 @@
     </div>
     {{end}}
 
+    {{if .IsLoggedIn}}
+    <!-- post btn -->
+    <div id="newPost">
+      <button class="icon-btn add-btn">
+        <div class="add-icon"></div>
+        <div id="newPostTxt" class="btn-txt">NEW POST</div>
+      </button>
+    </div>
+    {{end}}
+
+    <!-- post form -->
+    <div id="post-form" class="post-form" style="display: none">
+      <form action="/createPost" method="post">
+        <div class="container">
+          <div class="modal">
+            <div class="modal__header">
+              <span class="modal__title">New Post</span>
+            </div>
+            <div class="modal__body">
+              <div class="input">
+                <label class="input__label">Category</label>
+                <input
+                  class="input__field"
+                  type="text"
+                  id="Category"
+                  name="Category"
+                  list="categories"
+                  required
+                  autocomplete="off"
+                  autofocus
+                />
+                <datalist id="categories">
+                  {{range .AllCategories}}
+                  <option value="{{.Name}}"></option>
+                  {{end}}
+                </datalist>
+                <p class="input__description">
+                  Please select the category that corresponds to your post
+                </p>
+              </div>
+              <div class="input">
+                <label class="input__label">Post title</label>
+                <input
+                  class="input__field"
+                  type="text"
+                  id="PostName"
+                  name="PostName"
+                  required
+                  autocomplete="off"
+                  autofocus
+                />
+                <p class="input__description">
+                  The title must contain a maximum of 32 characters
+                </p>
+              </div>
+              <div class="input">
+                <label class="input__label">Content</label>
+                <textarea
+                  class="input__field input__field--textarea"
+                  id="PostContent"
+                  name="PostContent"
+                  required
+                  autocomplete="off"
+                ></textarea>
+                <p class="input__description">
+                  Give your post a good description so everyone know what's it
+                  for
+                </p>
+              </div>
+            </div>
+            <div class="modal__footer">
+              <button class="button button--primary">Create post</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
     <footer></footer>
   </body>
 
@@ -148,6 +328,81 @@
     window.addEventListener("resize", function () {
       if (window.innerWidth > 770) {
         getMobileMenu.style.display = "none";
+      }
+    });
+
+    const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("navButton");
+    const loginButtonMobile = document.getElementById("navButtonMobile");
+    const login = document.getElementById("login");
+    const loginMobile = document.getElementById("loginMobile");
+    const signUpButton = document.getElementById("signUp");
+    const signInButton = document.getElementById("signIn");
+    const container = document.getElementById("container");
+    const overlay = document.getElementById("overlay");
+    let loginActive = false;
+
+    // display the login form for mobile
+    loginButtonMobile.addEventListener("click", function () {
+      getMobileMenu.style.transform = "translateX(-100%)";
+      setTimeout(function () {
+        getMobileMenu.style.display = "none";
+      }, 300);
+      if (!loginActive) {
+        loginForm.style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+        loginActive = true;
+      }
+    });
+
+    // display the login form
+    if (loginButton != null) {
+      loginButton.addEventListener("click", function () {
+        if (!loginActive) {
+          loginForm.style.display = "block";
+          document.getElementById("overlay").style.display = "block";
+          loginActive = true;
+        }
+      });
+    }
+
+    // switch between the 2 panels
+    signUpButton.addEventListener("click", () => {
+      container.classList.add("right-panel-active");
+    });
+    signInButton.addEventListener("click", () => {
+      container.classList.remove("right-panel-active");
+    });
+
+    // remove the login form by clicking outside of it
+    overlay.addEventListener("click", function (e) {
+      if (loginActive) {
+        loginForm.style.display = "none";
+        overlay.style.display = "none";
+        loginActive = false;
+      }
+    });
+
+    const newPost = document.getElementById("newPost");
+    const postForm = document.getElementById("post-form");
+    let postActive = false;
+
+    // display the post form
+    newPost.addEventListener("click", function (e) {
+      console.log("clicked");
+      if (!postActive) {
+        postForm.style.display = "block";
+        overlay.style.display = "block";
+        postActive = true;
+      }
+    });
+
+    // remove the post form by clicking outside of it
+    overlay.addEventListener("click", function (e) {
+      if (postActive) {
+        postForm.style.display = "none";
+        overlay.style.display = "none";
+        postActive = false;
       }
     });
   </script>

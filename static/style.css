@@ -271,6 +271,11 @@ body {
     padding: 10px;
 }
 
+.trend li a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
 .trend li:hover {
     background-color: #3D3D3D;
 }
