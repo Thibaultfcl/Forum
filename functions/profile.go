@@ -43,7 +43,7 @@ func Profile(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	posts := getPostsFromUser(w, db, id)
-	categories := getCategories(w, db)
+	categories := getCategoriesByNumberOfPost(w, db)
 
 	var profilePicture string
 	if pp != nil {

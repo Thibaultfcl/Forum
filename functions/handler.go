@@ -12,6 +12,7 @@ import (
 type UserData struct {
 	IsLoggedIn     bool
 	ProfilePicture string
+	Category       CategoryData
 	Categories     []CategoryData
 	AllCategories  []CategoryData
 	Posts          []PostData
@@ -37,7 +38,7 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	fmt.Println("token: ", token)
 
 	posts := getPosts(w, db)
-	categories := getCategories(w, db)
+	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
 
 	//get the user data from the database

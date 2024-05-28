@@ -65,7 +65,7 @@
       <h2>Trending Categories</h2>
       <ol>
         {{range .Categories}}
-        <li>{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></li>
+        <li><a href="/category/{{.Name}}">{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></a></li>
         {{end}}
       </ol>
       <h2>Categories Followed</h2>

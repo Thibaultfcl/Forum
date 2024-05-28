@@ -257,7 +257,7 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int) []P
 	return posts
 }
 
-func getCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
+func getCategoriesByNumberOfPost(w http.ResponseWriter, db *sql.DB) []CategoryData {
 	var categories []CategoryData
 	rows, _ := db.Query("SELECT name, number_of_posts FROM categories ORDER BY number_of_posts DESC LIMIT 5")
 	for rows.Next() {
@@ -287,4 +287,18 @@ func getAllCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
 		categories = append(categories, CategoryData{Name: categoryName, NbofP: categoryNbofP})
 	}
 	return categories
+}
+
+func getCategoryById(w http.ResponseWriter, db *sql.DB, id int) []CategoryData {
+	var category []CategoryData
+	row := db.QueryRow("SELECT name, number_of_posts FROM categories WHERE id=?", id)
+	var name string
+	var nbofP int
+	err := row.Scan(&name, &nbofP)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return nil
+	}
+	category = append(category, CategoryData{Name: name, NbofP: nbofP})
+	return category
 }

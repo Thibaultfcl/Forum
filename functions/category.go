@@ -24,7 +24,8 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	posts := getPostsFromCategory(w, db, categoryID)
-	categories := getCategories(w, db)
+	category := getCategoryById(w, db, categoryID)
+	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
 
 	//get the user data from the database
@@ -35,7 +36,7 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err = row.Scan(&isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			serveCategoryPage(w, false, "", categories, nil, posts)
+			serveCategoryPage(w, false, "", categories, nil, posts, nil)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -48,11 +49,11 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	serveCategoryPage(w, true, profilePicture, categories, allCategories, posts)
+	serveCategoryPage(w, true, profilePicture, categories, allCategories, posts, category)
 }
 
-func serveCategoryPage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []CategoryData, allCategories []CategoryData, posts []PostData) {
-	userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, AllCategories: allCategories, Posts: posts}
+func serveCategoryPage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []CategoryData, allCategories []CategoryData, posts []PostData, category []CategoryData) {
+	userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, AllCategories: allCategories, Posts: posts, Category: category[0]}
 	tmpl, err := template.ParseFiles("tmpl/category.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
