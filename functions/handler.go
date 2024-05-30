@@ -12,7 +12,6 @@ import (
 type UserData struct {
 	IsLoggedIn     bool
 	ProfilePicture string
-	Category       CategoryData
 	Categories     []CategoryData
 	AllCategories  []CategoryData
 	Posts          []PostData
@@ -25,11 +24,6 @@ type PostData struct {
 	Author        string
 	AuthorPicture string
 	TimePosted    string
-}
-
-type CategoryData struct {
-	Name  string
-	NbofP int
 }
 
 // home page

@@ -259,32 +259,34 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int) []P
 
 func getCategoriesByNumberOfPost(w http.ResponseWriter, db *sql.DB) []CategoryData {
 	var categories []CategoryData
-	rows, _ := db.Query("SELECT name, number_of_posts FROM categories ORDER BY number_of_posts DESC LIMIT 5")
+	rows, _ := db.Query("SELECT id, name, number_of_posts FROM categories ORDER BY number_of_posts DESC LIMIT 5")
 	for rows.Next() {
+		var id int
 		var categoryName string
 		var categoryNbofP int
-		err := rows.Scan(&categoryName, &categoryNbofP)
+		err := rows.Scan(&id, &categoryName, &categoryNbofP)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		categories = append(categories, CategoryData{Name: categoryName, NbofP: categoryNbofP})
+		categories = append(categories, CategoryData{Id: id, Name: categoryName, NbofP: categoryNbofP})
 	}
 	return categories
 }
 
 func getAllCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
 	var categories []CategoryData
-	rows, _ := db.Query("SELECT name, number_of_posts FROM categories ORDER BY number_of_posts DESC")
+	rows, _ := db.Query("SELECT id, name, number_of_posts FROM categories ORDER BY number_of_posts DESC")
 	for rows.Next() {
+		var id int
 		var categoryName string
 		var categoryNbofP int
-		err := rows.Scan(&categoryName, &categoryNbofP)
+		err := rows.Scan(&id, &categoryName, &categoryNbofP)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		categories = append(categories, CategoryData{Name: categoryName, NbofP: categoryNbofP})
+		categories = append(categories, CategoryData{Id: id, Name: categoryName, NbofP: categoryNbofP})
 	}
 	return categories
 }
@@ -299,6 +301,6 @@ func getCategoryById(w http.ResponseWriter, db *sql.DB, id int) []CategoryData {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return nil
 	}
-	category = append(category, CategoryData{Name: name, NbofP: nbofP})
+	category = append(category, CategoryData{Id: id, Name: name, NbofP: nbofP})
 	return category
 }

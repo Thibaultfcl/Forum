@@ -676,3 +676,36 @@ body {
     font-size: 15px;
     color: rgba(255, 255, 255, 0.588);
 }
+
+.categoryTitle .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.categoryTitle .container {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.categoryTitle .container svg {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+    transition: all 0.3s;
+    fill: #666;
+}
+
+.categoryTitle .container svg:hover {
+    transform: scale(1.1);
+}
+
+.categoryTitle .container input:checked ~ svg {
+    fill: #ffeb49;
+}

@@ -57,8 +57,42 @@ func CreateTablePost(db *sql.DB) {
 	}
 }
 
+// function that creates a table UserLikedCategories
+func CreateTableUserLikedCategories(db *sql.DB) {
+    _, err := db.Exec(`
+        CREATE TABLE IF NOT EXISTS user_liked_categories (
+            user_id INTEGER NOT NULL,
+            category_id INTEGER NOT NULL,
+            PRIMARY KEY(user_id, category_id),
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(category_id) REFERENCES categories(id)
+        )
+    `)
+    if err != nil {
+        panic(err.Error())
+    }
+}
+
+// function that creates a table UserLikedCategories
+func CreateTableUserLikedPosts(db *sql.DB) {
+    _, err := db.Exec(`
+        CREATE TABLE IF NOT EXISTS user_liked_posts (
+            user_id INTEGER NOT NULL,
+            post_id INTEGER NOT NULL,
+            PRIMARY KEY(user_id, post_id),
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(post_id) REFERENCES posts(id)
+        )
+    `)
+    if err != nil {
+        panic(err.Error())
+    }
+}
+
 func CreateTable(db *sql.DB) {
 	CreateTableUser(db)
 	CreateTableCategories(db)
 	CreateTablePost(db)
+	CreateTableUserLikedCategories(db)
+	CreateTableUserLikedPosts(db)
 }

@@ -30,6 +30,8 @@ func main() {
 	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) { functions.Signin(w, r, db) })
 	http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) { functions.Signup(w, r, db) })
 	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) { functions.Logout(w, r, db) })
+	http.HandleFunc("/add-liked-category", func(w http.ResponseWriter, r *http.Request) { functions.AddLikedCategory(w, r, db) })
+  	http.HandleFunc("/remove-liked-category", func(w http.ResponseWriter, r *http.Request) { functions.RemoveLikedCategory(w, r, db) })
 
 	//load the CSS and the images
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
