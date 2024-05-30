@@ -173,11 +173,11 @@
       </ol>
       <h2>Categories Followed</h2>
       <ol>
-        <li>Category<span class="number_of_posts"> (30 followers)</span></li>
-        <li>Category<span class="number_of_posts"> (25 followers)</span></li>
-        <li>Category<span class="number_of_posts"> (18 followers)</span></li>
-        <li>Category<span class="number_of_posts"> (12 followers)</span></li>
-        <li>Category<span class="number_of_posts"> (12 followers)</span></li>
+        {{if .IsLoggedIn}}
+          {{range .CategoriesFollowed}}
+          <li><a href="/category/{{.Name}}">{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></a></li>
+          {{end}}
+        {{end}}
       </ol>
     </div>
 

@@ -10,14 +10,15 @@ import (
 )
 
 type CategoryPageData struct {
-	Id             int
-	IsLoggedIn     bool
-	UserLiked      bool
-	ProfilePicture string
-	Category       CategoryData
-	Categories     []CategoryData
-	AllCategories  []CategoryData
-	Posts          []PostData
+	Id                 int
+	IsLoggedIn         bool
+	UserLiked          bool
+	ProfilePicture     string
+	Category           CategoryData
+	Categories         []CategoryData
+	CategoriesFollowed []CategoryData
+	AllCategories      []CategoryData
+	Posts              []PostData
 }
 
 type CategoryData struct {
@@ -44,6 +45,7 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	category := getCategoryById(w, db, categoryID)
 	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
+	categoriesFollowed := getCategoriesFollowed(w, db, token)
 
 	//get the user data from the database
 	row = db.QueryRow("SELECT id, isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
@@ -54,7 +56,7 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err = row.Scan(&id, &isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			serveCategoryPage(w, 0, false, false, "", categories, nil, posts, nil)
+			serveCategoryPage(w, 0, false, false, "", categories, nil, nil, posts, category)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -67,15 +69,13 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	userLiked := true
 	row = db.QueryRow(("SELECT user_id, category_id FROM user_liked_categories WHERE user_id = ? AND category_id = ?"), id, categoryID)
 	var userID int
 	var categoryID2 int
 	err = row.Scan(&userID, &categoryID2)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			userLiked = false
-			serveCategoryPage(w, id, true, userLiked, profilePicture, categories, allCategories, posts, category)
+			serveCategoryPage(w, id, true, false, profilePicture, categories, categoriesFollowed, allCategories, posts, category)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -83,11 +83,11 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	}
 
-	serveCategoryPage(w, id, true, userLiked, profilePicture, categories, allCategories, posts, category)
+	serveCategoryPage(w, id, true, true, profilePicture, categories, categoriesFollowed, allCategories, posts, category)
 }
 
-func serveCategoryPage(w http.ResponseWriter, userID int, isLoggedIn bool, userLiked bool, pp string, categories []CategoryData, allCategories []CategoryData, posts []PostData, category []CategoryData) {
-	userData := CategoryPageData{Id: userID, IsLoggedIn: isLoggedIn, UserLiked: userLiked, ProfilePicture: pp, Categories: categories, AllCategories: allCategories, Posts: posts, Category: category[0]}
+func serveCategoryPage(w http.ResponseWriter, userID int, isLoggedIn bool, userLiked bool, pp string, categories []CategoryData, categoriesFollowed []CategoryData, allCategories []CategoryData, posts []PostData, category []CategoryData) {
+	userData := CategoryPageData{Id: userID, IsLoggedIn: isLoggedIn, UserLiked: userLiked, ProfilePicture: pp, Categories: categories, CategoriesFollowed: categoriesFollowed, AllCategories: allCategories, Posts: posts, Category: category[0]}
 	tmpl, err := template.ParseFiles("tmpl/category.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)

@@ -10,13 +10,14 @@ import (
 )
 
 type ProfileData struct {
-	Username       string
-	Email          string
-	IsAdmin        bool
-	IsBanned       bool
-	ProfilePicture string
-	Posts          []PostData
-	Categories     []CategoryData
+	Username           string
+	Email              string
+	IsAdmin            bool
+	IsBanned           bool
+	ProfilePicture     string
+	Posts              []PostData
+	Categories         []CategoryData
+	CategoriesFollowed []CategoryData
 }
 
 func Profile(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -44,17 +45,18 @@ func Profile(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	posts := getPostsFromUser(w, db, id)
 	categories := getCategoriesByNumberOfPost(w, db)
+	categoriesFollowed := getCategoriesFollowed(w, db, token)
 
 	var profilePicture string
 	if pp != nil {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	serveProfilePage(w, username, email, isAdmin, isBanned, profilePicture, posts, categories)
+	serveProfilePage(w, username, email, isAdmin, isBanned, profilePicture, posts, categories, categoriesFollowed)
 }
 
-func serveProfilePage(w http.ResponseWriter, username string, email string, isAdmin bool, isBanned bool, pp string, posts []PostData, categories []CategoryData) {
-	profileData := ProfileData{Username: username, Email: email, IsAdmin: isAdmin, IsBanned: isBanned, ProfilePicture: pp, Posts: posts, Categories: categories}
+func serveProfilePage(w http.ResponseWriter, username string, email string, isAdmin bool, isBanned bool, pp string, posts []PostData, categories []CategoryData, categoriesFollowed []CategoryData) {
+	profileData := ProfileData{Username: username, Email: email, IsAdmin: isAdmin, IsBanned: isBanned, ProfilePicture: pp, Posts: posts, Categories: categories, CategoriesFollowed: categoriesFollowed}
 	tmpl, err := template.ParseFiles("tmpl/profile.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)

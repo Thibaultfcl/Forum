@@ -18,7 +18,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	//creat the 2 tables
+	//creat the tables
 	functions.CreateTable(db)
 	defer db.Close()
 

@@ -304,3 +304,40 @@ func getCategoryById(w http.ResponseWriter, db *sql.DB, id int) []CategoryData {
 	category = append(category, CategoryData{Id: id, Name: name, NbofP: nbofP})
 	return category
 }
+
+func getCategoriesFollowed(w http.ResponseWriter, db *sql.DB, token string) []CategoryData {
+	var categories []CategoryData
+	if token == "" {
+		return categories
+	}
+	row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
+	var id int
+	err := row.Scan(&id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return nil
+	}
+	rows, err := db.Query("SELECT category_id FROM user_liked_categories WHERE user_id=?", id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return nil
+	}
+	for rows.Next() {
+		var categoryID int
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		row := db.QueryRow("SELECT name, number_of_posts FROM categories WHERE id=?", categoryID)
+		var name string
+		var nbofP int
+		err = row.Scan(&name, &nbofP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		categories = append(categories, CategoryData{Id: categoryID, Name: name, NbofP: nbofP})
+	}
+	return categories
+}

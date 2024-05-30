@@ -10,11 +10,12 @@ import (
 )
 
 type UserData struct {
-	IsLoggedIn     bool
-	ProfilePicture string
-	Categories     []CategoryData
-	AllCategories  []CategoryData
-	Posts          []PostData
+	IsLoggedIn         bool
+	ProfilePicture     string
+	Categories         []CategoryData
+	AllCategories      []CategoryData
+	CategoriesFollowed []CategoryData
+	Posts              []PostData
 }
 
 type PostData struct {
@@ -34,17 +35,16 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	posts := getPosts(w, db)
 	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
+	categoriesFollowed := getCategoriesFollowed(w, db, token)
 
 	//get the user data from the database
 	row := db.QueryRow("SELECT isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
 	var isAdmin, isBanned bool
 	var pp []byte
-
-	//scan and get the data
 	err := row.Scan(&isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			serveHomePage(w, false, "", categories, nil, posts)
+			serveHomePage(w, false, "", categories, nil, nil, posts)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -57,11 +57,11 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	serveHomePage(w, true, profilePicture, categories, allCategories, posts)
+	serveHomePage(w, true, profilePicture, categories, allCategories, categoriesFollowed, posts)
 }
 
-func serveHomePage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []CategoryData, allCategories []CategoryData, posts []PostData) {
-	userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, AllCategories: allCategories, Posts: posts}
+func serveHomePage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []CategoryData, allCategories []CategoryData, categoriesFollowed []CategoryData, posts []PostData) {
+	userData := UserData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, AllCategories: allCategories, CategoriesFollowed: categoriesFollowed, Posts: posts}
 	tmpl, err := template.ParseFiles("tmpl/home.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
