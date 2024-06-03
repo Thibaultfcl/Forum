@@ -43,7 +43,7 @@ func Profile(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	}
 
-	posts := getPostsFromUser(w, db, id)
+	posts := getPostsFromUser(w, db, id, token)
 	categories := getCategoriesByNumberOfPost(w, db)
 	categoriesFollowed := getCategoriesFollowed(w, db, token)
 

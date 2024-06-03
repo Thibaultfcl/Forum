@@ -25,6 +25,10 @@ type PostData struct {
 	Author        string
 	AuthorPicture string
 	TimePosted    string
+	Liked         bool
+	UserID        int
+	PostID        int
+	IsLoggedIn    bool
 }
 
 // home page
@@ -32,7 +36,7 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
 	fmt.Println("token: ", token)
 
-	posts := getPosts(w, db)
+	posts := getPosts(w, db, token)
 	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
 	categoriesFollowed := getCategoriesFollowed(w, db, token)
@@ -50,6 +54,10 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return
 		}
+	}
+
+	for i := range posts {
+		posts[i].IsLoggedIn = true
 	}
 
 	var profilePicture string

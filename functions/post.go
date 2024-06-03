@@ -80,17 +80,17 @@ func CreatePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	http.Redirect(w, r, "/home", redirect)
 }
 
-func getPosts(w http.ResponseWriter, db *sql.DB) []PostData {
+func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 	var posts []PostData
-	rows, err := db.Query(`SELECT title, content, date, category, author FROM posts ORDER BY date DESC`)
+	rows, err := db.Query(`SELECT id, title, content, date, category, author FROM posts ORDER BY date DESC`)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return posts
 	}
 	for rows.Next() {
-		var category, author int
+		var id, category, author int
 		var title, content, date string
-		err := rows.Scan(&title, &content, &date, &category, &author)
+		err := rows.Scan(&id, &title, &content, &date, &category, &author)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
@@ -134,22 +134,48 @@ func getPosts(w http.ResponseWriter, db *sql.DB) []PostData {
 		} else {
 			elapsedStr = fmt.Sprintf("%d days ago", int(elapsed.Hours()/24))
 		}
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr})
+
+		var liked bool
+		var user_id int
+		if token == "" {
+			liked = false
+		} else {
+			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
+			err := row.Scan(&user_id)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row = db.QueryRow("SELECT user_id, post_id FROM user_liked_posts WHERE user_id = ? AND post_id = ?", user_id, id)
+			var userID, postID int
+			err = row.Scan(&userID, &postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					liked = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return nil
+				}
+			} else {
+				liked = true
+			}
+		}
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, UserID: user_id, PostID: id})
 	}
 	return posts
 }
 
-func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int) []PostData {
+func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token string) []PostData {
 	var posts []PostData
-	rows, err := db.Query("SELECT title, content, date, category, author FROM posts WHERE author=? ORDER BY date DESC", authorID)
+	rows, err := db.Query("SELECT id, title, content, date, category, author FROM posts WHERE author=? ORDER BY date DESC", authorID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return posts
 	}
 	for rows.Next() {
-		var category, author int
+		var id, category, author int
 		var title, content, date string
-		err := rows.Scan(&title, &content, &date, &category, &author)
+		err := rows.Scan(&id, &title, &content, &date, &category, &author)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
@@ -193,22 +219,48 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int) []PostDat
 		} else {
 			elapsedStr = fmt.Sprintf("%d days ago", int(elapsed.Hours()/24))
 		}
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr})
+
+		var liked bool
+		var user_id int
+		if token == "" {
+			liked = false
+		} else {
+			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
+			err := row.Scan(&user_id)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row = db.QueryRow("SELECT user_id, post_id FROM user_liked_posts WHERE user_id = ? AND post_id = ?", user_id, id)
+			var userID, postID int
+			err = row.Scan(&userID, &postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					liked = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return nil
+				}
+			} else {
+				liked = true
+			}
+		}
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, UserID: user_id, PostID: id})
 	}
 	return posts
 }
 
-func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int) []PostData {
+func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, token string) []PostData {
 	var posts []PostData
-	rows, err := db.Query("SELECT title, content, date, category, author FROM posts WHERE category=? ORDER BY date DESC", categoryID)
+	rows, err := db.Query("SELECT id, title, content, date, category, author FROM posts WHERE category=? ORDER BY date DESC", categoryID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return posts
 	}
 	for rows.Next() {
-		var category, author int
+		var id, category, author int
 		var title, content, date string
-		err := rows.Scan(&title, &content, &date, &category, &author)
+		err := rows.Scan(&id, &title, &content, &date, &category, &author)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
@@ -252,7 +304,33 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int) []P
 		} else {
 			elapsedStr = fmt.Sprintf("%d days ago", int(elapsed.Hours()/24))
 		}
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr})
+
+		var liked bool
+		var user_id int
+		if token == "" {
+			liked = false
+		} else {
+			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
+			err := row.Scan(&user_id)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row = db.QueryRow("SELECT user_id, post_id FROM user_liked_posts WHERE user_id = ? AND post_id = ?", user_id, id)
+			var userID, postID int
+			err = row.Scan(&userID, &postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					liked = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return nil
+				}
+			} else {
+				liked = true
+			}
+		}
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, UserID: user_id, PostID: id})
 	}
 	return posts
 }

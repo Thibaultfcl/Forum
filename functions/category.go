@@ -41,7 +41,7 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	posts := getPostsFromCategory(w, db, categoryID)
+	posts := getPostsFromCategory(w, db, categoryID, token)
 	category := getCategoryById(w, db, categoryID)
 	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
@@ -62,6 +62,10 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return
 		}
+	}
+
+	for i := range posts {
+		posts[i].IsLoggedIn = true
 	}
 
 	var profilePicture string
