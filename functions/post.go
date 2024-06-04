@@ -160,7 +160,16 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 				liked = true
 			}
 		}
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, UserID: user_id, PostID: id})
+
+		row = db.QueryRow("SELECT COUNT(*) FROM user_liked_posts WHERE post_id=?", id)
+		var nbofLikes int
+		err = row.Scan(&nbofLikes)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -245,7 +254,16 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 				liked = true
 			}
 		}
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, UserID: user_id, PostID: id})
+
+		row = db.QueryRow("SELECT COUNT(*) FROM user_liked_posts WHERE post_id=?", id)
+		var nbofLikes int
+		err = row.Scan(&nbofLikes)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -330,7 +348,16 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 				liked = true
 			}
 		}
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, UserID: user_id, PostID: id})
+
+		row = db.QueryRow("SELECT COUNT(*) FROM user_liked_posts WHERE post_id=?", id)
+		var nbofLikes int
+		err = row.Scan(&nbofLikes)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, UserID: user_id, PostID: id})
 	}
 	return posts
 }

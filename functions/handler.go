@@ -26,6 +26,7 @@ type PostData struct {
 	AuthorPicture string
 	TimePosted    string
 	Liked         bool
+	NbofLikes     int
 	UserID        int
 	PostID        int
 	IsLoggedIn    bool
