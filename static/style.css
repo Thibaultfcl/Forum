@@ -344,6 +344,7 @@ body {
 
 .card section p.comment {
     margin-left: auto;
+    margin-right: 10px;
 }
 
 .logout {
@@ -727,56 +728,41 @@ body {
 }
 
 .heart-container .svg-filled {
-    animation: keyframes-svg-filled 1s;
     display: none;
-}
-
-.heart-container .svg-celebrate {
-    position: absolute;
-    animation: keyframes-svg-celebrate .5s;
-    animation-fill-mode: forwards;
-    display: none;
-    stroke: var(--heart-color);
-    fill: var(--heart-color);
-    stroke-width: 2px;
 }
 
 .heart-container .checkbox:checked~.svg-container .svg-filled {
     display: block
 }
 
-.heart-container .checkbox:checked~.svg-container .svg-celebrate {
-    display: block
+.commentBtn {
+    padding: 0;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    background-color: #c52726;
 }
 
-@keyframes keyframes-svg-filled {
-    0% {
-        transform: scale(0);
-    }
-
-    25% {
-        transform: scale(1.2);
-    }
-
-    50% {
-        transform: scale(1);
-        filter: brightness(1.5);
-    }
+.commentBtn .IconContainer {
+    width: 30px;
+    height: 30px;
+    background-color: #c52726;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 2;
+    transition-duration: .3s;
 }
 
-@keyframes keyframes-svg-celebrate {
-    0% {
-        transform: scale(0);
-    }
+.commentBtn .icon {
+    border-radius: 1px;
+}
 
-    50% {
-        opacity: 1;
-        filter: brightness(1.5);
-    }
-
-    100% {
-        transform: scale(1.4);
-        opacity: 0;
-        display: none;
-    }
+.commentBtn:active {
+    transform: scale(0.95);
+    transition-duration: .3s;
 }
