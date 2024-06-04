@@ -18,20 +18,6 @@ type UserData struct {
 	Posts              []PostData
 }
 
-type PostData struct {
-	Title         string
-	Content       string
-	Category      string
-	Author        string
-	AuthorPicture string
-	TimePosted    string
-	Liked         bool
-	NbofLikes     int
-	UserID        int
-	PostID        int
-	IsLoggedIn    bool
-}
-
 // home page
 func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)

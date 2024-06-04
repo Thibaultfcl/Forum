@@ -7,6 +7,10 @@ body {
     background-color: #181818;
 }
 
+a {
+    text-decoration: none;
+}
+
 .sticky {
     position: fixed;
     top: 0;

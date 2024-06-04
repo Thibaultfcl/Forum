@@ -13,7 +13,7 @@
     <header class="sticky">
       <div class="navbar">
         <div class="nav-logo">
-          <a href="#">FORUM</a>
+          <a href="/home">FORUM</a>
         </div>
         <div class="nav-items">
           <ul>
@@ -182,26 +182,26 @@
     </div>
 
     <!-- post card -->
-    {{range .Posts}}
-    <a href="/post/{{.PostID}}">
-      <div class="card">
-        <div class="ovelay"></div>
-        <header class="user">
-          <img src="data:image/jpeg;base64,{{.AuthorPicture}}" />
-          <div class="user-info">
-            <h2 class="user-info-name">{{.Author}}</h2>
-            <p class="user-info-time">{{.TimePosted}}</p>
-          </div>
-          <h3>{{.Category}} - {{.Title}}</h3>
-        </header>
-        <main>
-          <p>{{.Content}}</p>
-        </main>
-        <section>
-          {{if .IsLoggedIn}}
-          <div class="heart-container" title="Like">
-            <input type="checkbox" class="checkbox" id="like_btn" {{if .Liked}}checked{{end}} data-user-id="{{.UserID}}" data-post-id="{{.PostID}}">
-            <div class="svg-container">
+    <div class="card">
+      <div class="ovelay"></div>
+      <header class="user">
+        <img
+          src="data:image/jpeg;base64,{{.Post.AuthorPicture}}"
+        />
+        <div class="user-info">
+          <h2 class="user-info-name">{{.Post.Author}}</h2>
+          <p class="user-info-time">{{.Post.TimePosted}}</p>
+        </div>
+        <h3>{{.Post.Category}} - {{.Post.Title}}</h3>
+      </header>
+      <main>
+        <p>{{.Post.Content}}</p>
+      </main>
+      <section>
+        {{if .Post.IsLoggedIn}}
+        <div class="heart-container" title="Like">
+          <input type="checkbox" class="checkbox" id="like_btn" {{if .Post.Liked}}checked{{end}} data-user-id="{{.Post.UserID}}" data-post-id="{{.Post.PostID}}">
+          <div class="svg-container">
               <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
                   <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z">
                   </path>
@@ -218,99 +218,19 @@
                   <polygon points="90,50 80,50"></polygon>
                   <polygon points="80,80 70,70"></polygon>
               </svg>
-            </div>
-          </div>
-          {{end}}
-          <p>{{.NbofLikes}} likes</p>
-          <p class="comment">10 comment</p>
-          {{if .IsLoggedIn}}
-            <button class="commentBtn">
-              <span class="IconContainer"> 
-                <svg fill="white" viewBox="0 0 512 512" height="1em"><path d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z"></path></svg>
-              </span>
-            </button>
-          {{end}}
-        </section>
-      </div>
-    </a>
-    {{end}}
-
-    {{if .IsLoggedIn}}
-    <!-- post btn -->
-    <div id="newPost">
-      <button class="icon-btn add-btn">
-        <div class="add-icon"></div>
-        <div id="newPostTxt" class="btn-txt">NEW POST</div>
-      </button>
-    </div>
-    {{end}}
-
-    <!-- post form -->
-    <div id="post-form" class="post-form" style="display: none">
-      <form action="/createPost" method="post">
-        <div class="container">
-          <div class="modal">
-            <div class="modal__header">
-              <span class="modal__title">New Post</span>
-            </div>
-            <div class="modal__body">
-              <div class="input">
-                <label class="input__label">Category</label>
-                <input
-                  class="input__field"
-                  type="text"
-                  id="Category"
-                  name="Category"
-                  list="categories"
-                  required
-                  autocomplete="off"
-                  autofocus
-                />
-                <datalist id="categories">
-                  {{range .AllCategories}}
-                  <option value="{{.Name}}"></option>
-                  {{end}}
-                </datalist>
-                <p class="input__description">
-                  Please select the category that corresponds to your post
-                </p>
-              </div>
-              <div class="input">
-                <label class="input__label">Post title</label>
-                <input
-                  class="input__field"
-                  type="text"
-                  id="PostName"
-                  name="PostName"
-                  required
-                  autocomplete="off"
-                  autofocus
-                />
-                <p class="input__description">
-                  The title must contain a maximum of 32 characters
-                </p>
-              </div>
-              <div class="input">
-                <label class="input__label">Content</label>
-                <textarea
-                  class="input__field input__field--textarea"
-                  id="PostContent"
-                  name="PostContent"
-                  required
-                  autocomplete="off"
-                ></textarea>
-                <p class="input__description">
-                  Give your post a good description so everyone know what's it
-                  for
-                </p>
-              </div>
-            </div>
-            <div class="modal__footer">
-              <button class="button button--primary">Create post</button>
-            </div>
           </div>
         </div>
-      </form>
+        {{end}}
+        <p>{{.Post.NbofLikes}} likes</p>
+        <p class="comment">10 comment</p>
+        {{if .Post.IsLoggedIn}}
+          <button class="commentBtn">
+            <span class="IconContainer"> 
+              <svg fill="white" viewBox="0 0 512 512" height="1em"><path d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z"></path></svg>
+            </span>
+          </button>
+        {{end}}
+      </section>
     </div>
 
     <footer></footer>
@@ -401,32 +321,33 @@
       }
     });
 
-    const newPost = document.getElementById("newPost");
-    const postForm = document.getElementById("post-form");
-    let postActive = false;
-
-    // display the post form
-    if (newPost != null) {
-      newPost.addEventListener("click", function (e) {
-        console.log("clicked");
-        if (!postActive) {
-          postForm.style.display = "block";
-          overlay.style.display = "block";
-          postActive = true;
-        }
-      });
-    }
-
-    // remove the post form by clicking outside of it
-    overlay.addEventListener("click", function (e) {
-      if (postActive) {
-        postForm.style.display = "none";
-        overlay.style.display = "none";
-        postActive = false;
-      }
+    // category like
+    document.getElementById('likeCheckbox').addEventListener('change', function() {
+        const userId = this.getAttribute('data-user-id');
+        const categoryId = this.getAttribute('data-category-id');
+        const url = this.checked ? '/add-liked-category' : '/remove-liked-category';
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userID: parseInt(userId),
+                categoryID: parseInt(categoryId)
+            })
+        }).then(response => {
+            if (!response.ok) {
+                console.error('Error:', response.statusText);
+            } else {
+              location.reload();
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
     });
 
-    // like button
+    // post like
     document.getElementById('like_btn').addEventListener('change', function() {
         const userId = this.getAttribute('data-user-id');
         const postId = this.getAttribute('data-post-id');
