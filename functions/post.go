@@ -17,6 +17,7 @@ type PostPageData struct {
 	Categories         []CategoryData
 	CategoriesFollowed []CategoryData
 	Post               PostData
+	Comments           []CommentData
 }
 
 type PostData struct {
@@ -48,6 +49,7 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	post := getPostById(w, db, postID, token)
 	categories := getCategoriesByNumberOfPost(w, db)
 	categoriesFollowed := getCategoriesFollowed(w, db, token)
+	comments := getComments(w, db, postID, token)
 
 	//get the user data from the database
 	row := db.QueryRow("SELECT isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
@@ -57,7 +59,7 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err = row.Scan(&isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			servePostPage(w, false, "", categories, nil, post)
+			servePostPage(w, false, "", categories, nil, post, comments)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -71,11 +73,11 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	servePostPage(w, true, profilePicture, categories, categoriesFollowed, post)
+	servePostPage(w, true, profilePicture, categories, categoriesFollowed, post, comments)
 }
 
-func servePostPage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []CategoryData, categoriesFollowed []CategoryData, post PostData) {
-	userData := PostPageData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, CategoriesFollowed: categoriesFollowed, Post: post}
+func servePostPage(w http.ResponseWriter, isLoggedIn bool, pp string, categories []CategoryData, categoriesFollowed []CategoryData, post PostData, comments []CommentData) {
+	userData := PostPageData{IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, CategoriesFollowed: categoriesFollowed, Post: post, Comments: comments}
 	tmpl, err := template.ParseFiles("tmpl/post.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)

@@ -231,6 +231,23 @@
           </button>
         {{end}}
       </section>
+      <section>
+        <form action="/comment" method="post">
+          <div class="commentInput">
+            <input placeholder="Add a comment" type="text" class="textInput" id="Comment" name="Comment" required autocomplete="off">
+            <input type="hidden" id="PostID" name="PostID" value="{{.Post.PostID}}">
+          </div>
+        </form>
+        {{range .Comments}}
+        <div class="comment">
+          <img src="data:image/jpeg;base64,{{.AuthorPicture}}" />
+          <div class="comment-info">
+            <h2>{{.Author}}</h2>
+            <p>{{.Content}}</p>
+          </div>
+        </div>
+        {{end}}
+      </section>
     </div>
 
     <footer></footer>
