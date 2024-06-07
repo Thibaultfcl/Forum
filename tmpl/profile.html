@@ -18,7 +18,8 @@
         <div class="nav-search">
           <form class="form" action="#" method="post">
             <label for="search">
-                <input class="input" type="text" required placeholder="Search" id="search" autocomplete="off">
+                <input class="input" type="text" list="suggestions" placeholder="Search" id="search" autocomplete="off" required>
+                <datalist id="suggestions"></datalist>
                 <div class="fancy-bg"></div>
                 <div class="search">
                     <svg viewBox="0 0 24 24" aria-hidden="true" class="r-14j79pv r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-4wgw6l r-f727ji r-bnwqim r-1plcrui r-lrvibr">
@@ -276,5 +277,45 @@
         getMobileMenu.style.display = "none";
       }
     });
+
+    // search
+    if (document.getElementById('search') != null) {
+      document.getElementById('search').addEventListener('input', function() {
+        const search = this.value;
+        if (search == '') {
+          return;
+        }
+
+        const suggestions = document.getElementById('suggestions');
+        suggestions.innerHTML = '';
+
+        fetch('/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            search: search
+          })
+        }).then(response => {
+          if (!response.ok) {
+            console.error('Error:', response.statusText);
+          } else {
+            response.json().then(data => {
+              if (data == null) {
+                return;
+              }
+              data.forEach(suggestion => {
+                const option = document.createElement('option');
+                option.value = suggestion.name;
+                suggestions.appendChild(option);
+              });
+            });
+          }
+        }).catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    }
   </script>
 </html>
