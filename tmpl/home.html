@@ -198,7 +198,7 @@
     <a href="/post/{{.PostID}}">
       <div class="card">
         <header class="user">
-          <img class="pp" src="data:image/jpeg;base64,{{.AuthorPicture}}" data-user-id="{{.UserID}}"/>
+          <img class="ppUser" src="data:image/jpeg;base64,{{.AuthorPicture}}" data-user-id="{{.AuthorID}}"/>
           <div class="user-info">
             <h2 class="user-info-name">{{.Author}}</h2>
             <p class="user-info-time">{{.TimePosted}}</p>
@@ -506,7 +506,7 @@
     }
 
     // get user page
-    var pps = document.querySelectorAll('.pp');
+    var pps = document.querySelectorAll('.ppUser');
     if (pps != null) {
       pps.forEach(pp => {
         pp.addEventListener('click', function(e) {

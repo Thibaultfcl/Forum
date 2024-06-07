@@ -25,6 +25,7 @@ type PostData struct {
 	Content       string
 	Category      string
 	Author        string
+	AuthorID      int
 	AuthorPicture string
 	TimePosted    string
 	Liked         bool
@@ -261,7 +262,7 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 			return nil
 		}
 
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -363,7 +364,7 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 			return nil
 		}
 
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -465,7 +466,7 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 			return nil
 		}
 
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -552,14 +553,14 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 	}
 
 	row = db.QueryRow("SELECT COUNT(*) FROM comments WHERE post_id=?", id)
-		var nbofComments int
-		err = row.Scan(&nbofComments)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-			return PostData{}
-		}
+	var nbofComments int
+	err = row.Scan(&nbofComments)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return PostData{}
+	}
 
-	posts = PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id}
+	posts = PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id}
 	return posts
 }
 
