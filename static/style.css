@@ -40,36 +40,109 @@ a {
     -moz-box-shadow: 7px 5px 15px -4px rgba(0, 0, 0, 0.75);
 }
 
-.nav-items > ul > li {
+.nav-search .form {
+    --input-text-color: #fff;
+    --input-bg-color: #3D3D3D;
+    --focus-input-bg-color: transparent;
+    --text-color: #949faa;
+    --active-color: #AAAAAA;
+    --width-of-input: 300px;
+    --height-of-input: 40px;
+    --inline-padding-of-input: 1.2em;
+    --gap: 0.9rem;
+}
+
+.nav-search .form {
+    font-size: 0.9rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    width: var(--width-of-input);
+    height: var(--height-of-input);
     position: relative;
-    display: inline;
-    list-style: none;
-    margin: 10px;
-    padding: 10px 20px;
-    cursor: pointer;
+    isolation: isolate;
 }
 
-.nav-items > ul > li > a {
-    color: #FFFFFF;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.nav-items > ul > li::after {
-    content: "";
+.nav-search .fancy-bg {
     position: absolute;
     width: 100%;
-    height: 0.17rem;
-    background-color: #c52726;
-    left: 0;
-    bottom: 0;
-    transform-origin: 0% 100%;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
+    inset: 0;
+    background: var(--input-bg-color);
+    border-radius: 30px;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
 
-.nav-items > ul > li:hover::after {
-    transform: scaleX(1);
+.nav-search label {
+    width: 100%;
+    padding: 0.8em;
+    height: 40px;
+    padding-inline: var(--inline-padding-of-input);
+    display: flex;
+    align-items: center;
+}
+
+.nav-search .search,.close-btn {
+    position: absolute;
+}
+
+.nav-search .search {
+    fill: var(--text-color);
+    left: var(--inline-padding-of-input);
+}
+
+.nav-search svg {
+    width: 17px;
+    display: block;
+}
+
+.nav-search .close-btn {
+    border: none;
+    right: var(--inline-padding-of-input);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 0.1em;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--active-color);
+    opacity: 0;
+    visibility: hidden;
+}
+
+.nav-search .input {
+    color: var(--input-text-color);
+    width: 100%;
+    margin-inline: min(2em,calc(var(--inline-padding-of-input) + var(--gap)));
+    background: none;
+    border: none;
+}
+
+.nav-search .input:focus {
+    outline: none;
+}
+
+.nav-search .input::placeholder {
+    color: var(--text-color)
+}
+
+.nav-search .input:focus ~ .fancy-bg {
+    border: 1px solid var(--active-color);
+    background: var(--focus-input-bg-color);
+}
+
+.nav-search .input:focus ~ .search {
+    fill: var(--active-color);
+}
+
+.nav-search .input:valid ~ .close-btn {
+    opacity: 1;
+    visibility: visible;
 }
 
 .nav-logo a,
