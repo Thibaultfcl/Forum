@@ -195,11 +195,10 @@
 
     <!-- post card -->
     <div class="card">
-      <div class="ovelay"></div>
       <header class="user">
-        <img
-          src="data:image/jpeg;base64,{{.Post.AuthorPicture}}"
-        />
+        <a href="/user/{{.Post.UserID}}">  
+          <img src="data:image/jpeg;base64,{{.Post.AuthorPicture}}"/>
+        </a>
         <div class="user-info">
           <h2 class="user-info-name">{{.Post.Author}}</h2>
           <p class="user-info-time">{{.Post.TimePosted}}</p>
@@ -474,7 +473,7 @@
       document.getElementById('search').addEventListener('input', function() {
         const suggestions = document.getElementById('suggestions');
         suggestions.innerHTML = '';
-        
+
         const search = this.value;
         if (search == '') {
           return;

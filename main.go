@@ -27,6 +27,7 @@ func main() {
 	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { functions.Profile(w, r, db) })
 	http.HandleFunc("/category/", func(w http.ResponseWriter, r *http.Request) { functions.Category(w, r, db) })
 	http.HandleFunc("/post/", func(w http.ResponseWriter, r *http.Request) { functions.Post(w, r, db) })
+	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) { functions.User(w, r, db) })
 	http.HandleFunc("/createPost", func(w http.ResponseWriter, r *http.Request) { functions.CreatePost(w, r, db) })
 	http.HandleFunc("/comment", func(w http.ResponseWriter, r *http.Request) { functions.CreateComment(w, r, db) })
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) { functions.GetSuggestions(w, r, db) })

@@ -949,3 +949,24 @@ a {
 .commentInput:focus-within .textInput::placeholder {
     opacity: 0;
 }
+
+.userTitle {
+    position: relative;
+    top: 100px;
+    left: 10%;
+    max-width: 50%;
+    max-height: 45px;
+    font-size: 20px;
+    color: #FFFFFF;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.userTitle img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}

@@ -197,9 +197,8 @@
     {{range .Posts}}
     <a href="/post/{{.PostID}}">
       <div class="card">
-        <div class="ovelay"></div>
         <header class="user">
-          <img src="data:image/jpeg;base64,{{.AuthorPicture}}" />
+          <img class="pp" src="data:image/jpeg;base64,{{.AuthorPicture}}" data-user-id="{{.UserID}}"/>
           <div class="user-info">
             <h2 class="user-info-name">{{.Author}}</h2>
             <p class="user-info-time">{{.TimePosted}}</p>
@@ -471,7 +470,7 @@
       document.getElementById('search').addEventListener('input', function() {
         const suggestions = document.getElementById('suggestions');
         suggestions.innerHTML = '';
-        
+
         const search = this.value;
         if (search == '') {
           return;
@@ -502,6 +501,18 @@
           }
         }).catch(error => {
           console.error('Error:', error);
+        });
+      });
+    }
+
+    // get user page
+    var pps = document.querySelectorAll('.pp');
+    if (pps != null) {
+      pps.forEach(pp => {
+        pp.addEventListener('click', function(e) {
+          e.preventDefault();
+          const userId = this.getAttribute('data-user-id');
+          window.location.href = '/user/' + userId;
         });
       });
     }
