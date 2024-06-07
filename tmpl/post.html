@@ -472,13 +472,13 @@
     // search
     if (document.getElementById('search') != null) {
       document.getElementById('search').addEventListener('input', function() {
+        const suggestions = document.getElementById('suggestions');
+        suggestions.innerHTML = '';
+        
         const search = this.value;
         if (search == '') {
           return;
         }
-
-        const suggestions = document.getElementById('suggestions');
-        suggestions.innerHTML = '';
 
         fetch('/search', {
           method: 'POST',
