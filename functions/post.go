@@ -67,6 +67,9 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	}
 	post.IsLoggedIn = true
+	for i := range comments {
+		comments[i].IsLoggedIn = true
+	}
 
 	var profilePicture string
 	if pp != nil {

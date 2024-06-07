@@ -20,7 +20,7 @@ type CommentData struct {
 	IsLoggedIn    bool
 }
 
-func Comment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func CreateComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	//we check if the method is a POST
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
