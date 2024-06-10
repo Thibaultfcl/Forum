@@ -89,10 +89,47 @@ func CreateTableUserLikedPosts(db *sql.DB) {
     }
 }
 
+// function that creates a table Comments
+func CreateTableComments(db *sql.DB) {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS comments (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			post_id INTEGER NOT NULL,
+			content TEXT NOT NULL,
+			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY(user_id) REFERENCES users(id),
+			FOREIGN KEY(post_id) REFERENCES post(id)
+		)
+	`)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+// function that creates a table UserLikedComments
+func CreateTableUserLikedComments(db *sql.DB) {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS user_liked_comments (
+			user_id INTEGER NOT NULL,
+			comment_id INTEGER NOT NULL,
+			PRIMARY KEY(user_id, comment_id),
+			FOREIGN KEY(user_id) REFERENCES users(id),
+			FOREIGN KEY(comment_id) REFERENCES comments(id)
+		)
+	`)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+// function that creates all the tables
 func CreateTable(db *sql.DB) {
 	CreateTableUser(db)
 	CreateTableCategories(db)
 	CreateTablePost(db)
 	CreateTableUserLikedCategories(db)
 	CreateTableUserLikedPosts(db)
+	CreateTableComments(db)
+	CreateTableUserLikedComments(db)
 }

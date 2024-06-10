@@ -13,26 +13,49 @@
     <header class="sticky">
       <div class="navbar">
         <div class="nav-logo">
-          <a href="#">FORUM</a>
+          <a href="/home">FORUM</a>
         </div>
         <div class="nav-search">
           <form class="form" action="#" method="post">
             <label for="search">
-                <input class="input" type="text" list="suggestions" placeholder="Search" id="search" autocomplete="off" required>
-                <datalist id="suggestions"></datalist>
-                <div class="fancy-bg"></div>
-                <div class="search">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" class="r-14j79pv r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-4wgw6l r-f727ji r-bnwqim r-1plcrui r-lrvibr">
-                        <g>
-                            <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                        </g>
-                    </svg>
-                </div>
-                <button class="close-btn" type="reset">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                    </svg>
-                </button>
+              <input
+                class="input"
+                type="text"
+                list="suggestions"
+                placeholder="Search"
+                id="search"
+                autocomplete="off"
+                required
+              />
+              <datalist id="suggestions"></datalist>
+              <div class="fancy-bg"></div>
+              <div class="search">
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  class="r-14j79pv r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-4wgw6l r-f727ji r-bnwqim r-1plcrui r-lrvibr"
+                >
+                  <g>
+                    <path
+                      d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+                    ></path>
+                  </g>
+                </svg>
+              </div>
+              <button class="close-btn" type="reset">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </button>
             </label>
           </form>
         </div>
@@ -180,25 +203,42 @@
       <h2>Trending Categories</h2>
       <ol>
         {{range .Categories}}
-        <li><a href="/category/{{.Name}}">{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></a></li>
+        <li>
+          <a href="/category/{{.Name}}"
+            >{{.Name}}<span class="number_of_posts">
+              ({{.NbofP}} posts)</span
+            ></a
+          >
+        </li>
         {{end}}
       </ol>
       <h2>Categories Followed</h2>
       <ol>
-        {{if .IsLoggedIn}}
-          {{range .CategoriesFollowed}}
-          <li><a href="/category/{{.Name}}">{{.Name}}<span class="number_of_posts"> ({{.NbofP}} posts)</span></a></li>
-          {{end}}
-        {{end}}
+        {{if .IsLoggedIn}} {{range .CategoriesFollowed}}
+        <li>
+          <a href="/category/{{.Name}}"
+            >{{.Name}}<span class="number_of_posts">
+              ({{.NbofP}} posts)</span
+            ></a
+          >
+        </li>
+        {{end}} {{end}}
       </ol>
+    </div>
+
+    <!-- user title -->
+    <div class="userTitle">
+      <img src="data:image/jpeg;base64,{{.UserPage.ProfilePicture}}" />
+      <h1>{{.UserPage.Username}}</h1>
     </div>
 
     <!-- post card -->
     {{range .Posts}}
     <a href="/post/{{.PostID}}">
       <div class="card">
+        <div class="ovelay"></div>
         <header class="user">
-          <img class="ppUser" src="data:image/jpeg;base64,{{.AuthorPicture}}" data-user-id="{{.AuthorID}}"/>
+          <img src="data:image/jpeg;base64,{{.AuthorPicture}}" />
           <div class="user-info">
             <h2 class="user-info-name">{{.Author}}</h2>
             <p class="user-info-time">{{.TimePosted}}</p>
@@ -211,23 +251,46 @@
         <section>
           {{if .IsLoggedIn}}
           <div class="heart-container" title="Like">
-            <input type="checkbox" class="checkbox" id="like_btn" {{if .Liked}}checked{{end}} data-user-id="{{.UserID}}" data-post-id="{{.PostID}}">
+            <input
+              type="checkbox"
+              class="checkbox"
+              id="like_btn"
+              {{if
+              .Liked}}checked{{end}}
+              data-user-id="{{.UserID}}"
+              data-post-id="{{.PostID}}"
+            />
             <div class="svg-container">
-              <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z">
-                  </path>
+              <svg
+                viewBox="0 0 24 24"
+                class="svg-outline"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"
+                ></path>
               </svg>
-              <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z">
-                  </path>
+              <svg
+                viewBox="0 0 24 24"
+                class="svg-filled"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"
+                ></path>
               </svg>
-              <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-                  <polygon points="10,10 20,20"></polygon>
-                  <polygon points="10,50 20,50"></polygon>
-                  <polygon points="20,80 30,70"></polygon>
-                  <polygon points="90,10 80,20"></polygon>
-                  <polygon points="90,50 80,50"></polygon>
-                  <polygon points="80,80 70,70"></polygon>
+              <svg
+                class="svg-celebrate"
+                width="100"
+                height="100"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polygon points="10,10 20,20"></polygon>
+                <polygon points="10,50 20,50"></polygon>
+                <polygon points="20,80 30,70"></polygon>
+                <polygon points="90,10 80,20"></polygon>
+                <polygon points="90,50 80,50"></polygon>
+                <polygon points="80,80 70,70"></polygon>
               </svg>
             </div>
           </div>
@@ -235,17 +298,21 @@
           <p>{{.NbofLikes}} likes</p>
           <p class="comment">{{.NbofComments}} comment</p>
           {{if .IsLoggedIn}}
-            <button class="commentBtn">
-              <span class="IconContainer"> 
-                <svg fill="white" viewBox="0 0 512 512" height="1em"><path d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z"></path></svg>
-              </span>
-            </button>
+          <button class="commentBtn">
+            <span class="IconContainer">
+              <svg fill="white" viewBox="0 0 512 512" height="1em">
+                <path
+                  d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z"
+                ></path>
+              </svg>
+            </span>
+          </button>
           {{end}}
         </section>
       </div>
     </a>
-    {{end}}
-
+    {{end}} 
+    
     {{if .IsLoggedIn}}
     <!-- post btn -->
     <div id="newPost">
@@ -437,83 +504,111 @@
       }
     });
 
-    // like button
-    if (document.getElementById('like_btn') != null) {
-      document.getElementById('like_btn').addEventListener('change', function() {
-          const userId = this.getAttribute('data-user-id');
-          const postId = this.getAttribute('data-post-id');
-          const url = this.checked ? '/add-liked-post' : '/remove-liked-post';
-          
+    // category like
+    if (document.getElementById("likeCheckbox") != null) {
+      document
+        .getElementById("likeCheckbox")
+        .addEventListener("change", function () {
+          const userId = this.getAttribute("data-user-id");
+          const categoryId = this.getAttribute("data-category-id");
+          const url = this.checked
+            ? "/add-liked-category"
+            : "/remove-liked-category";
+
           fetch(url, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                  userID: parseInt(userId),
-                  postID: parseInt(postId)
-              })
-          }).then(response => {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userID: parseInt(userId),
+              categoryID: parseInt(categoryId),
+            }),
+          })
+            .then((response) => {
               if (!response.ok) {
-                  console.error('Error:', response.statusText);
+                console.error("Error:", response.statusText);
               } else {
                 location.reload();
               }
-          }).catch(error => {
-              console.error('Error:', error);
-          });
-      });
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+    }
+
+    // post like
+    if (document.getElementById("like_btn") != null) {
+      document
+        .getElementById("like_btn")
+        .addEventListener("change", function () {
+          const userId = this.getAttribute("data-user-id");
+          const postId = this.getAttribute("data-post-id");
+          const url = this.checked ? "/add-liked-post" : "/remove-liked-post";
+
+          fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userID: parseInt(userId),
+              postID: parseInt(postId),
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                console.error("Error:", response.statusText);
+              } else {
+                location.reload();
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
     }
 
     // search
-    if (document.getElementById('search') != null) {
-      document.getElementById('search').addEventListener('input', function() {
-        const suggestions = document.getElementById('suggestions');
-        suggestions.innerHTML = '';
+    if (document.getElementById("search") != null) {
+      document.getElementById("search").addEventListener("input", function () {
+        const suggestions = document.getElementById("suggestions");
+        suggestions.innerHTML = "";
 
         const search = this.value;
-        if (search == '') {
+        if (search == "") {
           return;
         }
 
-        fetch('/search', {
-          method: 'POST',
+        fetch("/search", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            search: search
-          })
-        }).then(response => {
-          if (!response.ok) {
-            console.error('Error:', response.statusText);
-          } else {
-            response.json().then(data => {
-              if (data == null) {
-                return;
-              }
-              data.forEach(suggestion => {
-                const option = document.createElement('option');
-                option.value = suggestion.name;
-                suggestions.appendChild(option);
+            search: search,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              console.error("Error:", response.statusText);
+            } else {
+              response.json().then((data) => {
+                if (data == null) {
+                  return;
+                }
+                data.forEach((suggestion) => {
+                  const option = document.createElement("option");
+                  option.value = suggestion.name;
+                  suggestions.appendChild(option);
+                });
               });
-            });
-          }
-        }).catch(error => {
-          console.error('Error:', error);
-        });
-      });
-    }
-
-    // get user page
-    var pps = document.querySelectorAll('.ppUser');
-    if (pps != null) {
-      pps.forEach(pp => {
-        pp.addEventListener('click', function(e) {
-          e.preventDefault();
-          const userId = this.getAttribute('data-user-id');
-          window.location.href = '/user/' + userId;
-        });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
       });
     }
   </script>
