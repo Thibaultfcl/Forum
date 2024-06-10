@@ -9,6 +9,8 @@ import (
 
 type Suggestion struct {
 	Name string `json:"name"`
+	Type string `json:"type"`
+	Id  int    `json:"id,omitempty"`
 }
 
 func GetSuggestions(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -41,11 +43,12 @@ func GetSuggestions(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return
 		}
+		suggestion.Type = "category"
 		suggestions = append(suggestions, suggestion)
 	}
 
 	if len(suggestions) < 5 {
-		rows, err := db.Query("SELECT username FROM users WHERE username LIKE ? LIMIT ?", "%"+data.Search+"%", 5-len(suggestions))
+		rows, err := db.Query("SELECT id, username FROM users WHERE username LIKE ? LIMIT ?", "%"+data.Search+"%", 5-len(suggestions))
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return
@@ -54,11 +57,12 @@ func GetSuggestions(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 		for rows.Next() {
 			var suggestion Suggestion
-			err := rows.Scan(&suggestion.Name)
+			err := rows.Scan(&suggestion.Id, &suggestion.Name)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 				return
 			}
+			suggestion.Type = "user"
 			suggestions = append(suggestions, suggestion)
 		}
 	}

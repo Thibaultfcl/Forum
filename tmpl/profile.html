@@ -16,7 +16,7 @@
           <a href="/home">FORUM</a>
         </div>
         <div class="nav-search">
-          <form class="form" action="#" method="post">
+          <form class="form" id="formSearch" action="#" method="post">
             <label for="search">
                 <input class="input" type="text" list="suggestions" placeholder="Search" id="search" autocomplete="off" required>
                 <datalist id="suggestions"></datalist>
@@ -307,6 +307,10 @@
               data.forEach(suggestion => {
                 const option = document.createElement('option');
                 option.value = suggestion.name;
+                option.dataset.type = suggestion.type;
+                if (suggestion.type == 'user') {
+                  option.dataset.id = suggestion.id;
+                }
                 suggestions.appendChild(option);
               });
             });
@@ -314,6 +318,29 @@
         }).catch(error => {
           console.error('Error:', error);
         });
+      });
+    }
+
+    // search redirect
+    form = document.getElementById('formSearch');
+    if (form != null) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let search = document.getElementById('search').value;
+        const datalist = document.getElementById('suggestions');
+        let url = '/searchError/' + search;
+
+        for (let i = 0; i < datalist.options.length; i++) {
+          let option = datalist.options[i];
+          if (option.value === search) {
+            if (option.dataset.type == 'user') {
+              search = option.dataset.id;
+            }
+            url = '/' + option.dataset.type + '/' + search;
+            break;
+          }
+        }
+        window.location.href = url;
       });
     }
   </script>
