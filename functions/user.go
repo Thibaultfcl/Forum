@@ -13,11 +13,15 @@ import (
 type UserPageData struct {
 	UserPage           UserPage
 	IsLoggedIn         bool
+	UserID             int
 	ProfilePicture     string
+	IsAdmin            bool
+	IsBanned           bool
 	Categories         []CategoryData
 	CategoriesFollowed []CategoryData
 	AllCategories      []CategoryData
 	Posts              []PostData
+	HisAccount         bool
 }
 
 type UserPage struct {
@@ -56,13 +60,14 @@ func User(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	allCategories := getAllCategories(w, db)
 	categoriesFollowed := getCategoriesFollowed(w, db, token)
 
-	row = db.QueryRow("SELECT isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
+	row = db.QueryRow("SELECT id, isAdmin, isBanned, pp FROM users WHERE UUID=?", token)
+	var id int
 	var isAdmin, isBanned bool
 	var pp []byte
-	err = row.Scan(&isAdmin, &isBanned, &pp)
+	err = row.Scan(&id, &isAdmin, &isBanned, &pp)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			serveUserPage(w, user, false, "", categories, nil, nil, posts)
+			serveUserPage(w, user, false, 0, "", false, false, categories, nil, nil, posts, false)
 			return
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -79,11 +84,17 @@ func User(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		profilePicture = base64.StdEncoding.EncodeToString(pp)
 	}
 
-	serveUserPage(w, user, true, profilePicture, categories, categoriesFollowed, allCategories, posts)
+	if id == userID {
+		serveUserPage(w, user, true, id, profilePicture, isAdmin, isBanned, categories, categoriesFollowed, allCategories, posts, true)
+		return
+	} else {
+		serveUserPage(w, user, true, id, profilePicture, isAdmin, isBanned, categories, categoriesFollowed, allCategories, posts, false)
+		return
+	}
 }
 
-func serveUserPage(w http.ResponseWriter, userPage UserPage, isLoggedIn bool, pp string, categories []CategoryData, categoriesFollowed []CategoryData, allCategories []CategoryData, posts []PostData) {
-	userData := UserPageData{UserPage: userPage, IsLoggedIn: isLoggedIn, ProfilePicture: pp, Categories: categories, CategoriesFollowed: categoriesFollowed, AllCategories: allCategories, Posts: posts}
+func serveUserPage(w http.ResponseWriter, userPage UserPage, isLoggedIn bool, userID int, pp string, isAdmin bool, isBanned bool, categories []CategoryData, categoriesFollowed []CategoryData, allCategories []CategoryData, posts []PostData, hisAccount bool) {
+	userData := UserPageData{UserPage: userPage, IsLoggedIn: isLoggedIn, UserID: userID, ProfilePicture: pp, IsAdmin: isAdmin, IsBanned: isBanned, Categories: categories, CategoriesFollowed: categoriesFollowed, AllCategories: allCategories, Posts: posts, HisAccount: hisAccount}
 	tmpl, err := template.ParseFiles("tmpl/user.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)

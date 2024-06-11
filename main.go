@@ -24,7 +24,6 @@ func main() {
 
 	//handle the different pages
 	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) { functions.Home(w, r, db) })
-	http.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) { functions.Profile(w, r, db) })
 	http.HandleFunc("/category/", func(w http.ResponseWriter, r *http.Request) { functions.Category(w, r, db) })
 	http.HandleFunc("/post/", func(w http.ResponseWriter, r *http.Request) { functions.Post(w, r, db) })
 	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) { functions.User(w, r, db) })
@@ -44,6 +43,7 @@ func main() {
 	//load the CSS and the images
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img"))))
+	http.Handle("/script/", http.StripPrefix("/script/", http.FileServer(http.Dir("./script"))))
 
 	//start the local host
 	fmt.Println("\n(http://localhost:8080/home) - Server started on port", port)
