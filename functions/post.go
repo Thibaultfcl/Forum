@@ -3,6 +3,7 @@ package functions
 import (
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -27,6 +28,7 @@ type PostData struct {
 	Title         string
 	Content       string
 	Category      string
+	CategoryID    int
 	Author        string
 	AuthorID      int
 	AuthorPicture string
@@ -34,6 +36,7 @@ type PostData struct {
 	Liked         bool
 	NbofLikes     int
 	NbofComments  int
+	UserIsAdmin   bool
 	UserID        int
 	PostID        int
 	IsLoggedIn    bool
@@ -168,6 +171,49 @@ func CreatePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	http.Redirect(w, r, "/home", redirect)
 }
 
+func DeletePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var data struct {
+		PostID     int `json:"postID"`
+		CategoryID int `json:"categoryID"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.Exec("DELETE FROM posts WHERE id=?", data.PostID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+	}
+
+	_, err = db.Exec("UPDATE categories SET number_of_posts = number_of_posts - 1 WHERE id=?", data.CategoryID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error while updating the number of posts: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	row := db.QueryRow("SELECT number_of_posts FROM categories WHERE id=?", data.CategoryID)
+	var nbofPosts int
+	err = row.Scan(&nbofPosts)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if nbofPosts == 0 {
+		_, err = db.Exec("DELETE FROM categories WHERE id=?", data.CategoryID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
 func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 	var posts []PostData
 	rows, err := db.Query(`SELECT id, title, content, date, category, author FROM posts ORDER BY date DESC`)
@@ -183,25 +229,24 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+
 		var categoryStr, authorStr string
+		var authorPP []byte
+		var authorIsBanned bool
 		row := db.QueryRow("SELECT name FROM categories WHERE id=?", category)
 		err = row.Scan(&categoryStr)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		row = db.QueryRow("SELECT username FROM users WHERE id=?", author)
-		err = row.Scan(&authorStr)
+		row = db.QueryRow("SELECT username, pp, isBanned FROM users WHERE id=?", author)
+		err = row.Scan(&authorStr, &authorPP, &authorIsBanned)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		var authorPP []byte
-		row = db.QueryRow("SELECT pp FROM users WHERE id=?", author)
-		err = row.Scan(&authorPP)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-			return nil
+		if authorIsBanned {
+			continue
 		}
 
 		const layout = "2006-01-02T15:04:05Z07:00"
@@ -225,11 +270,12 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 
 		var liked bool
 		var user_id int
+		var userIsAdmin bool
 		if token == "" {
 			liked = false
 		} else {
-			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
-			err := row.Scan(&user_id)
+			row := db.QueryRow("SELECT id, isAdmin FROM users WHERE UUID=?", token)
+			err := row.Scan(&user_id, &userIsAdmin)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 				return nil
@@ -265,7 +311,7 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 			return nil
 		}
 
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, CategoryID: category, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserIsAdmin: userIsAdmin, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -285,25 +331,24 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+
 		var categoryStr, authorStr string
+		var authorPP []byte
+		var authorIsBanned bool
 		row := db.QueryRow("SELECT name FROM categories WHERE id=?", category)
 		err = row.Scan(&categoryStr)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		row = db.QueryRow("SELECT username FROM users WHERE id=?", author)
-		err = row.Scan(&authorStr)
+		row = db.QueryRow("SELECT username, pp, isBanned FROM users WHERE id=?", author)
+		err = row.Scan(&authorStr, &authorPP, &authorIsBanned)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		var authorPP []byte
-		row = db.QueryRow("SELECT pp FROM users WHERE id=?", author)
-		err = row.Scan(&authorPP)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-			return nil
+		if authorIsBanned {
+			continue
 		}
 
 		const layout = "2006-01-02T15:04:05Z07:00"
@@ -327,11 +372,12 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 
 		var liked bool
 		var user_id int
+		var userIsAdmin bool
 		if token == "" {
 			liked = false
 		} else {
-			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
-			err := row.Scan(&user_id)
+			row := db.QueryRow("SELECT id, isAdmin FROM users WHERE UUID=?", token)
+			err := row.Scan(&user_id, &userIsAdmin)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 				return nil
@@ -367,7 +413,7 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 			return nil
 		}
 
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, CategoryID: category, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserIsAdmin: userIsAdmin, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -387,25 +433,24 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+
 		var categoryStr, authorStr string
+		var authorPP []byte
+		var authorIsBanned bool
 		row := db.QueryRow("SELECT name FROM categories WHERE id=?", category)
 		err = row.Scan(&categoryStr)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		row = db.QueryRow("SELECT username FROM users WHERE id=?", author)
-		err = row.Scan(&authorStr)
+		row = db.QueryRow("SELECT username, pp, isBanned FROM users WHERE id=?", author)
+		err = row.Scan(&authorStr, &authorPP, &authorIsBanned)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		var authorPP []byte
-		row = db.QueryRow("SELECT pp FROM users WHERE id=?", author)
-		err = row.Scan(&authorPP)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-			return nil
+		if authorIsBanned {
+			continue
 		}
 
 		const layout = "2006-01-02T15:04:05Z07:00"
@@ -429,11 +474,12 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 
 		var liked bool
 		var user_id int
+		var userIsAdmin bool
 		if token == "" {
 			liked = false
 		} else {
-			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
-			err := row.Scan(&user_id)
+			row := db.QueryRow("SELECT id, isAdmin FROM users WHERE UUID=?", token)
+			err := row.Scan(&user_id, &userIsAdmin)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 				return nil
@@ -469,7 +515,7 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 			return nil
 		}
 
-		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id})
+		posts = append(posts, PostData{Title: title, Content: content, Category: categoryStr, CategoryID: category, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserIsAdmin: userIsAdmin, UserID: user_id, PostID: id})
 	}
 	return posts
 }
@@ -484,26 +530,23 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return PostData{}
 	}
+
 	var categoryStr, authorStr string
+	var authorPP []byte
+	var authorIsBanned bool
 	row = db.QueryRow("SELECT name FROM categories WHERE id=?", category)
 	err = row.Scan(&categoryStr)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return PostData{}
 	}
-	row = db.QueryRow("SELECT username FROM users WHERE id=?", author)
-	err = row.Scan(&authorStr)
+	row = db.QueryRow("SELECT username, pp, isBanned FROM users WHERE id=?", author)
+	err = row.Scan(&authorStr, &authorPP, &authorIsBanned)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return PostData{}
 	}
-	var authorPP []byte
-	row = db.QueryRow("SELECT pp FROM users WHERE id=?", author)
-	err = row.Scan(&authorPP)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return PostData{}
-	}
+
 	const layout = "2006-01-02T15:04:05Z07:00"
 	t, err := time.Parse(layout, date)
 	if err != nil {
@@ -522,13 +565,15 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 	} else {
 		elapsedStr = fmt.Sprintf("%d days ago", int(elapsed.Hours()/24))
 	}
+
 	var liked bool
 	var user_id int
+	var userIsAdmin bool
 	if token == "" {
 		liked = false
 	} else {
-		row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
-		err := row.Scan(&user_id)
+		row := db.QueryRow("SELECT id, isAdmin FROM users WHERE UUID=?", token)
+		err := row.Scan(&user_id, &userIsAdmin)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return PostData{}
@@ -563,7 +608,7 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 		return PostData{}
 	}
 
-	posts = PostData{Title: title, Content: content, Category: categoryStr, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserID: user_id, PostID: id}
+	posts = PostData{Title: title, Content: content, Category: categoryStr, CategoryID: category, Author: authorStr, AuthorID: author, AuthorPicture: base64.StdEncoding.EncodeToString(authorPP), TimePosted: elapsedStr, Liked: liked, NbofLikes: nbofLikes, NbofComments: nbofComments, UserIsAdmin: userIsAdmin, UserID: user_id, PostID: id}
 	return posts
 }
 

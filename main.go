@@ -20,6 +20,7 @@ func main() {
 	}
 	//creat the tables
 	functions.CreateTable(db)
+	functions.CreateAdminAccount(db)
 	defer db.Close()
 
 	//handle the different pages
@@ -28,6 +29,7 @@ func main() {
 	http.HandleFunc("/post/", func(w http.ResponseWriter, r *http.Request) { functions.Post(w, r, db) })
 	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) { functions.User(w, r, db) })
 	http.HandleFunc("/createPost", func(w http.ResponseWriter, r *http.Request) { functions.CreatePost(w, r, db) })
+	http.HandleFunc("/deletePost", func(w http.ResponseWriter, r *http.Request) { functions.DeletePost(w, r, db) })
 	http.HandleFunc("/comment", func(w http.ResponseWriter, r *http.Request) { functions.CreateComment(w, r, db) })
 	http.HandleFunc("/editProfile", func(w http.ResponseWriter, r *http.Request) { functions.EditProfile(w, r, db) })
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) { functions.GetSuggestions(w, r, db) })

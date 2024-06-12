@@ -378,7 +378,14 @@ a {
 
 .card header.user {
     display: flex;
+    justify-content: space-between;
     gap: 12px;
+}
+
+.card header.user .userInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .card header.user img {
@@ -400,11 +407,28 @@ a {
     color: rgba(255, 255, 255, 0.588);
 }
 
+.card header .headerTitle {
+    font-size: 20px;
+    color: #fff;
+}
+
+.card main {
+    display: flex;
+    align-items: baseline;
+    gap : 15px;
+}
+
 .card main p {
     font-size: 14px;
     color: #fff;
-    margin-top: 16px;
     line-height: 1.7;
+}
+
+.card main .title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin-left: 50px;
 }
 
 .card section {
@@ -1031,4 +1055,44 @@ a {
     opacity: 1;
     transform: translateY(0px);
     transition-duration: 0.3s;
+}
+
+.bin {
+    scale: 0.7;
+}
+
+.bin-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 15px;
+    background-color: #c52726;
+    cursor: pointer;
+    border: 1px solid #c52726;
+    transition-duration: 0.3s;
+}
+
+.bin-bottom {
+    width: 15px;
+}
+
+.bin-top {
+    width: 17px;
+    transform-origin: right;
+    transition-duration: 0.3s;
+}
+
+.bin-button:hover .bin-top {
+    transform: rotate(45deg);
+}
+
+.bin-button:hover {
+    background-color: #701212;
+}
+
+.bin-button:active {
+    transform: scale(0.9);
 }
