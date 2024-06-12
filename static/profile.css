@@ -1,15 +1,21 @@
+.editProfile * {
+    z-index: 1000;
+}
+
 .editProfile .form {
     position: absolute;
-	top: 50%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-width: 350px;
     padding: 20px;
     border-radius: 20px;
     color: #fff;
+    background-color: #1a1a1a;
+    width: 350px;
+    height: 425px;
 }
 
 .editProfile .title {
@@ -19,8 +25,9 @@
     position: relative;
     display: flex;
     align-items: center;
-    padding-left: 30px;
+    padding-left: 50px;
     color: #c52726;
+    margin-bottom: 0;
 }
 
 .editProfile .title::before {
@@ -41,8 +48,46 @@
     height: 16px;
     width: 16px;
     border-radius: 50%;
-    left: 0px;
+    left: 20px;
     background-color: #c52726;
+}
+
+.editProfile .editpp {
+    position: relative;
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.editProfile .editpp img {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.editProfile .editpp input[type=file] {
+    width: 350px;
+    max-width: 100%;
+    color: #fff;
+    padding: 8px;
+    background-color: #1a1a1a;
+}
+
+.editProfile .editpp input[type=file]::file-selector-button {
+    margin-right: 8px;
+    border: none;
+    background: #c52726;
+    padding: 8px 12px;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.editProfile .editpp input[type=file]::file-selector-button:hover {
+    background: #701212;
 }
 
 .editProfile .signin {
@@ -62,14 +107,9 @@
     color: #c52726;
 }
 
-.editProfile .flex {
-    display: flex;
-    width: 100%;
-    gap: 6px;
-}
-
 .editProfile .form label {
     position: relative;
+    display: flex;
 }
 
 .editProfile .form label .input {
@@ -97,7 +137,7 @@
     font-size: 0.9em;
 }
 
-.editProfile.form label .input:focus + span,
+.editProfile .form label .input:focus + span,
 .editProfile .form label .input:valid + span {
     color: #c52726;
     top: 0px;
@@ -121,7 +161,7 @@
 }
 
 .editProfile .submit:hover {
-    background-color: #c52726;
+    background-color: #701212;
 }
 
 @keyframes pulse {
