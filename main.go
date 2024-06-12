@@ -29,6 +29,7 @@ func main() {
 	http.HandleFunc("/user/", func(w http.ResponseWriter, r *http.Request) { functions.User(w, r, db) })
 	http.HandleFunc("/createPost", func(w http.ResponseWriter, r *http.Request) { functions.CreatePost(w, r, db) })
 	http.HandleFunc("/comment", func(w http.ResponseWriter, r *http.Request) { functions.CreateComment(w, r, db) })
+	http.HandleFunc("/editProfile", func(w http.ResponseWriter, r *http.Request) { functions.EditProfile(w, r, db) })
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) { functions.GetSuggestions(w, r, db) })
 	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) { functions.Signin(w, r, db) })
 	http.HandleFunc("/signup", func(w http.ResponseWriter, r *http.Request) { functions.Signup(w, r, db) })
