@@ -3,6 +3,7 @@ package functions
 import (
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -15,6 +16,7 @@ type CommentData struct {
 	TimePosted    string
 	Liked         bool
 	NbofLikes     int
+	UserIsAdmin   bool
 	UserID        int
 	CommentID     int
 	IsLoggedIn    bool
@@ -50,6 +52,27 @@ func CreateComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	http.Redirect(w, r, "/post/"+postID, redirect)
+}
+
+func DeleteComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var data struct {
+		CommentID     int `json:"commentID"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.Exec("DELETE FROM comments WHERE id=?", data.CommentID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+	}
 }
 
 func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []CommentData {
@@ -99,8 +122,8 @@ func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []
 		if token == "" {
 			comment.Liked = false
 		} else {
-			row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
-			err = row.Scan(&user_id)
+			row := db.QueryRow("SELECT id, isAdmin FROM users WHERE UUID=?", token)
+			err = row.Scan(&user_id, &comment.UserIsAdmin)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error getting user id: %v", err), http.StatusInternalServerError)
 				return nil

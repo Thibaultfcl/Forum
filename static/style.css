@@ -1061,7 +1061,8 @@ a {
     scale: 0.7;
 }
 
-.bin-button {
+.bin-button,
+.bin-button-comment {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1085,14 +1086,17 @@ a {
     transition-duration: 0.3s;
 }
 
-.bin-button:hover .bin-top {
+.bin-button:hover .bin-top,
+.bin-button-comment:hover .bin-top {
     transform: rotate(45deg);
 }
 
-.bin-button:hover {
+.bin-button:hover
+.bin-button-comment:hover {
     background-color: #701212;
 }
 
-.bin-button:active {
+.bin-button:active
+.bin-button-comment:active {
     transform: scale(0.9);
 }

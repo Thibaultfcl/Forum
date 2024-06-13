@@ -31,6 +31,7 @@ func main() {
 	http.HandleFunc("/createPost", func(w http.ResponseWriter, r *http.Request) { functions.CreatePost(w, r, db) })
 	http.HandleFunc("/deletePost", func(w http.ResponseWriter, r *http.Request) { functions.DeletePost(w, r, db) })
 	http.HandleFunc("/comment", func(w http.ResponseWriter, r *http.Request) { functions.CreateComment(w, r, db) })
+	http.HandleFunc("/deleteComment", func(w http.ResponseWriter, r *http.Request) { functions.DeleteComment(w, r, db) })
 	http.HandleFunc("/editProfile", func(w http.ResponseWriter, r *http.Request) { functions.EditProfile(w, r, db) })
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) { functions.GetSuggestions(w, r, db) })
 	http.HandleFunc("/signin", func(w http.ResponseWriter, r *http.Request) { functions.Signin(w, r, db) })
