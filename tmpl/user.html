@@ -68,11 +68,13 @@
             </button>
           </form>
           {{if .IsAdmin}}
-          <button class="setting-btn">
-            <span class="bar bar1"></span>
-            <span class="bar bar2"></span>
-            <span class="bar bar1"></span>
-          </button>
+          <form action="/admin" method="post">
+            <button class="setting-btn">
+              <span class="bar bar1"></span>
+              <span class="bar bar2"></span>
+              <span class="bar bar1"></span>
+            </button>
+          </form>
           {{end}}
           <form action="/logout" method="post">
             <button class="logout">

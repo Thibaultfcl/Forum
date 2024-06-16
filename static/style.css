@@ -1162,3 +1162,52 @@ a {
     justify-content: center;
     gap : 10px;
 }
+
+table {
+    position: relative;
+    top: 100px;
+    left: 3%;
+    width: 75%;
+    border-collapse: collapse;
+    color: #fff;
+}
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #444;
+}
+th {
+    background-color: #222;
+}
+
+.button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    color: #fff;
+}
+
+.button:hover {
+    opacity: 0.8;
+}
+.true {
+    background-color: green;
+}
+.false {
+    background-color: red;
+}
+.reset-button {
+    background-color: #555;
+}
+.reset-button:hover {
+    background-color: #888;
+}
+
+.reset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
