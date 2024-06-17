@@ -12,6 +12,7 @@ func CreateTableUser(db *sql.DB) {
             password VARCHAR(12) NOT NULL,
 			email TEXT NOT NULL,
 			isAdmin BOOL NOT NULL DEFAULT FALSE,
+			isModerator BOOL NOT NULL DEFAULT FALSE,
 			isBanned BOOL NOT NULL DEFAULT FALSE,
 			pp BLOB,
 			UUID VARCHAR(36) NOT NULL

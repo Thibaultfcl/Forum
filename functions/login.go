@@ -70,7 +70,7 @@ func Signup(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	//we creat a new user in the db
-	_, err = db.Exec("INSERT INTO users (username, password, email, isAdmin, isBanned, pp, UUID) VALUES (?, ?, ?, FALSE, FALSE, ?, ?)", username, password, email, ppDefault, token)
+	_, err = db.Exec("INSERT INTO users (username, password, email, isAdmin, isModerator, isBanned, pp, UUID) VALUES (?, ?, ?, FALSE, FALSE, FALSE, ?, ?)", username, password, email, ppDefault, token)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
@@ -106,6 +106,14 @@ func Signin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		} else {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		}
+		return
+	}
+
+	row = db.QueryRow("SELECT isBanned FROM users WHERE email=?", email)
+	var isBanned bool
+	err = row.Scan(&isBanned)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
 	}
 

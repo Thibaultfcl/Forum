@@ -103,3 +103,88 @@ func serveCategoryPage(w http.ResponseWriter, userID int, isLoggedIn bool, userL
 		log.Printf("Error executing template: %v", err)
 	}
 }
+
+func getCategoriesByNumberOfPost(w http.ResponseWriter, db *sql.DB) []CategoryData {
+	var categories []CategoryData
+	rows, _ := db.Query("SELECT id, name, number_of_posts FROM categories ORDER BY number_of_posts DESC LIMIT 5")
+	for rows.Next() {
+		var id int
+		var categoryName string
+		var categoryNbofP int
+		err := rows.Scan(&id, &categoryName, &categoryNbofP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		categories = append(categories, CategoryData{Id: id, Name: categoryName, NbofP: categoryNbofP})
+	}
+	return categories
+}
+
+func getAllCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
+	var categories []CategoryData
+	rows, _ := db.Query("SELECT id, name, number_of_posts FROM categories ORDER BY number_of_posts DESC")
+	for rows.Next() {
+		var id int
+		var categoryName string
+		var categoryNbofP int
+		err := rows.Scan(&id, &categoryName, &categoryNbofP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		categories = append(categories, CategoryData{Id: id, Name: categoryName, NbofP: categoryNbofP})
+	}
+	return categories
+}
+
+func getCategoryById(w http.ResponseWriter, db *sql.DB, id int) []CategoryData {
+	var category []CategoryData
+	row := db.QueryRow("SELECT name, number_of_posts FROM categories WHERE id=?", id)
+	var name string
+	var nbofP int
+	err := row.Scan(&name, &nbofP)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return nil
+	}
+	category = append(category, CategoryData{Id: id, Name: name, NbofP: nbofP})
+	return category
+}
+
+func getCategoriesFollowed(w http.ResponseWriter, db *sql.DB, token string) []CategoryData {
+	var categories []CategoryData
+	if token == "" {
+		return categories
+	}
+	row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
+	var id int
+	err := row.Scan(&id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return nil
+	}
+	rows, err := db.Query("SELECT category_id FROM user_liked_categories WHERE user_id=?", id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return nil
+	}
+	for rows.Next() {
+		var categoryID int
+		err := rows.Scan(&categoryID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		row := db.QueryRow("SELECT name, number_of_posts FROM categories WHERE id=?", categoryID)
+		var name string
+		var nbofP int
+		err = row.Scan(&name, &nbofP)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		categories = append(categories, CategoryData{Id: categoryID, Name: name, NbofP: nbofP})
+	}
+	return categories
+}

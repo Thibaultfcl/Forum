@@ -10,16 +10,17 @@ import (
 )
 
 type CommentData struct {
-	Content       string
-	Author        string
-	AuthorPicture string
-	TimePosted    string
-	Liked         bool
-	NbofLikes     int
-	UserIsAdmin   bool
-	UserID        int
-	CommentID     int
-	IsLoggedIn    bool
+	Content         string
+	Author          string
+	AuthorPicture   string
+	TimePosted      string
+	Liked           bool
+	NbofLikes       int
+	UserIsAdmin     bool
+	UserIsModerator bool
+	UserID          int
+	CommentID       int
+	IsLoggedIn      bool
 }
 
 func CreateComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -33,11 +34,16 @@ func CreateComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
 
 	//we get the user id
-	row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
+	row := db.QueryRow("SELECT id, isBanned FROM users WHERE UUID=?", token)
 	var id int
-	err := row.Scan(&id)
+	var isBanned bool
+	err := row.Scan(&id, &isBanned)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("You need to be logged in to create a post: %v", err), http.StatusUnauthorized)
+		return
+	}
+	if isBanned {
+		http.Error(w, "You are banned", http.StatusUnauthorized)
 		return
 	}
 
@@ -61,7 +67,7 @@ func DeleteComment(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	var data struct {
-		CommentID     int `json:"commentID"`
+		CommentID int `json:"commentID"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -91,11 +97,15 @@ func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []
 		}
 		var authorStr string
 		var authorPP []byte
-		row := db.QueryRow("SELECT username, pp FROM users WHERE id=?", comment.UserID)
-		err = row.Scan(&authorStr, &authorPP)
+		var AuthorIsBanned bool
+		row := db.QueryRow("SELECT username, pp, isBanned FROM users WHERE id=?", comment.UserID)
+		err = row.Scan(&authorStr, &authorPP, &AuthorIsBanned)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error getting author: %v", err), http.StatusInternalServerError)
 			return nil
+		}
+		if AuthorIsBanned {
+			continue
 		}
 		comment.Author = authorStr
 		comment.AuthorPicture = base64.StdEncoding.EncodeToString(authorPP)
@@ -122,8 +132,8 @@ func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []
 		if token == "" {
 			comment.Liked = false
 		} else {
-			row := db.QueryRow("SELECT id, isAdmin FROM users WHERE UUID=?", token)
-			err = row.Scan(&user_id, &comment.UserIsAdmin)
+			row := db.QueryRow("SELECT id, isAdmin, isModerator FROM users WHERE UUID=?", token)
+			err = row.Scan(&user_id, &comment.UserIsAdmin, &comment.UserIsModerator)
 			if err != nil {
 				http.Error(w, fmt.Sprintf("Error getting user id: %v", err), http.StatusInternalServerError)
 				return nil
@@ -149,6 +159,31 @@ func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []
 			http.Error(w, fmt.Sprintf("Error getting number of likes: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+		rows, err := db.Query("SELECT user_id FROM user_liked_comments WHERE comment_id=?", comment.CommentID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		var userID int
+		var bannedUsers int
+		for rows.Next() {
+			err = rows.Scan(&userID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row := db.QueryRow("SELECT isBanned FROM users WHERE id=?", userID)
+			var isBanned bool
+			err = row.Scan(&isBanned)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			if isBanned {
+				bannedUsers++
+			}
+		}
+		comment.NbofLikes -= bannedUsers
 
 		comments = append(comments, comment)
 	}

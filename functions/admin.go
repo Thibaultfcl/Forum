@@ -24,6 +24,7 @@ type UserTable struct {
 	ID             int
 	Username       string
 	IsAdmin        bool
+	IsModerator    bool
 	IsBanned       bool
 	ProfilePicture string
 }
@@ -65,7 +66,7 @@ func CreateAdminAccount(db *sql.DB) error {
 	}
 
 	//insert the admin account in the database
-	_, err = db.Exec("INSERT INTO users (username, email, password, isAdmin, isBanned, pp, UUID) VALUES (?, ?, ?, TRUE, FALSE, ?, ?)", "admin", "admin@gmail.com", password, ppDefault, newToken)
+	_, err = db.Exec("INSERT INTO users (username, email, password, isAdmin, isModerator, isBanned, pp, UUID) VALUES (?, ?, ?, TRUE, FALSE, FALSE, ?, ?)", "admin", "admin@gmail.com", password, ppDefault, newToken)
 	if err != nil {
 		return fmt.Errorf("error while creating the admin account: %v", err)
 	}
