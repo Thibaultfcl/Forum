@@ -97,26 +97,27 @@ func Admin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	//get the admin data
+	adminData := AdminData{}
 	row = db.QueryRow("SELECT id, pp FROM users WHERE UUID=?", token)
-	var adminID int
 	var adminPPbyte []byte
-	err = row.Scan(&adminID, &adminPPbyte)
+	err = row.Scan(&adminData.UserID, &adminPPbyte)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
 	}
-	var adminPP string
 	if adminPPbyte != nil {
-		adminPP = base64.StdEncoding.EncodeToString(adminPPbyte)
+		adminData.ProfilePicture = base64.StdEncoding.EncodeToString(adminPPbyte)
 	}
 
 	//get the categories
 	categories := getCategoriesByNumberOfPost(w, db)
 	categoriesFollowed := getCategoriesFollowed(w, db, token)
+	adminData.Categories = categories
+	adminData.CategoriesFollowed = categoriesFollowed
 
 	//get the users
 	users := []UserTable{}
-	rows, err := db.Query("SELECT id, username, isAdmin, isBanned, pp FROM users ORDER BY id DESC")
+	rows, err := db.Query("SELECT id, username, isAdmin, isModerator, isBanned, pp FROM users ORDER BY id DESC")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
@@ -124,7 +125,7 @@ func Admin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	for rows.Next() {
 		var user UserTable
 		var pp []byte
-		err := rows.Scan(&user.ID, &user.Username, &user.IsAdmin, &user.IsBanned, &pp)
+		err := rows.Scan(&user.ID, &user.Username, &user.IsAdmin, &user.IsModerator, &user.IsBanned, &pp)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return
@@ -134,9 +135,9 @@ func Admin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 		users = append(users, user)
 	}
+	adminData.Users = users
 
 	// create the template
-	adminData := AdminData{UserID: adminID, ProfilePicture: adminPP, Users: users, Categories: categories, CategoriesFollowed: categoriesFollowed}
 	tmpl, err := template.ParseFiles("tmpl/admin.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -193,6 +194,60 @@ func SwitchAdminStatus(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 	} else {
 		_, err = db.Exec("UPDATE users SET isAdmin = TRUE WHERE id=?", data.UserID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func SwitchModoStatus(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := GetSessionToken(r)
+	if token == "" {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+	row := db.QueryRow("SELECT isAdmin FROM users WHERE UUID=?", token)
+	var isAdmin bool
+	err := row.Scan(&isAdmin)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if !isAdmin {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	var data struct {
+		UserID int `json:"userID"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	row = db.QueryRow("SELECT isModerator FROM users WHERE id=?", data.UserID)
+	var isModerator bool
+	err = row.Scan(&isModerator)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return
+	}
+	if isModerator {
+		_, err = db.Exec("UPDATE users SET isModerator = FALSE WHERE id=?", data.UserID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		_, err = db.Exec("UPDATE users SET isModerator = TRUE WHERE id=?", data.UserID)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return

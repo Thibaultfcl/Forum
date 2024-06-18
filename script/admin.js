@@ -25,6 +25,33 @@ if (adminBtns != null) {
     });
 }
 
+var modoBtns = document.querySelectorAll('.moderator');
+if (modoBtns != null) {
+    modoBtns.forEach(modoBtn => {
+        modoBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const userId = this.getAttribute('data-user-id');
+            fetch('/switchModoStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userID: parseInt(userId),
+                })
+            }).then(response => {
+                if (!response.ok) {
+                    console.error('Error:', response.statusText);
+                } else {
+                    location.reload();
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+}
+
 var banBtns = document.querySelectorAll('.ban');
 if (banBtns != null) {
     banBtns.forEach(banBtn => {

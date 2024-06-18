@@ -1211,3 +1211,44 @@ th {
     justify-content: center;
     gap: 10px;
 }
+
+.modo {
+    scale: 0.7;
+}
+
+.modo .container {
+    --color: rgba(255, 255, 255, 0.588);
+    --size: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    font-size: var(--size);
+    user-select: none;
+    fill: var(--color);
+}
+
+.modo .container .flag-regular {
+    position: absolute;
+}
+
+.modo .container .flag-solid {
+    position: absolute;
+    display: none;
+}
+
+.modo .container input:checked ~ .flag-regular {
+    display: none;
+}
+
+.modo .container input:checked ~ .flag-solid {
+    display: block;
+}
+
+.modo .container input {
+    position: relative;
+    opacity: 0;
+    cursor: pointer;
+}

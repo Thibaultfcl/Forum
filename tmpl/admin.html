@@ -143,6 +143,7 @@
               <th>ID</th>
               <th>Username</th>
               <th>Is Admin</th>
+              <th>Is Moderator</th>
               <th>Is Banned</th>
               <th>Profile Picture</th>
           </tr>
@@ -157,6 +158,10 @@
                       {{if .IsAdmin}}True{{else}}False{{end}}
                   </button>
               </td>
+              <td>
+                  <button class="button {{if .IsModerator}}true{{else}}false{{end}} moderator" data-user-id="{{.ID}}">
+                      {{if .IsModerator}}True{{else}}False{{end}}
+                  </button>
               <td>
                   <button class="button {{if .IsBanned}}true{{else}}false{{end}} ban" data-user-id="{{.ID}}">
                       {{if .IsBanned}}True{{else}}False{{end}}

@@ -1,11 +1,11 @@
-// comment like
-var commentCheckboxes = document.querySelectorAll('.checkboxComment');
-if (commentCheckboxes != null) {
-    for (var i = 0; i < commentCheckboxes.length; i++) {
-        commentCheckboxes[i].addEventListener('change', function() {
+// report comment
+var commentReport = document.querySelectorAll('.reportComment');
+if (commentReport != null) {
+    for (var i = 0; i < commentReport.length; i++) {
+        commentReport[i].addEventListener('change', function() {
             const userId = this.getAttribute('data-user-id');
             const commentId = this.getAttribute('data-comment-id');
-            const url = this.checked ? '/add-liked-comment' : '/remove-liked-comment';
+            const url = this.checked ? '/report-comment' : '/unreport-comment';
             fetch(url, {
                 method: 'POST',
                 headers: {

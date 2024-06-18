@@ -124,6 +124,37 @@ func CreateTableUserLikedComments(db *sql.DB) {
 	}
 }
 
+func CreateTablePostReported(db *sql.DB) {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS posts_reported (
+			post_id INTEGER NOT NULL,
+			user_id INTEGER NOT NULL,
+			PRIMARY KEY(post_id, user_id),
+			FOREIGN KEY(post_id) REFERENCES posts(id),
+			FOREIGN KEY(user_id) REFERENCES users(id)
+		)
+	`)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+func CreateTableCommentReported(db *sql.DB) {
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS comments_reported (
+			comment_id INTEGER NOT NULL,
+			user_id INTEGER NOT NULL,
+			PRIMARY KEY(comment_id, user_id),
+			FOREIGN KEY(comment_id) REFERENCES comments(id),
+			FOREIGN KEY(user_id) REFERENCES users(id)
+		)
+	`)
+	if err != nil {
+		panic(err.Error())
+	}
+
+}
+
 // function that creates all the tables
 func CreateTable(db *sql.DB) {
 	CreateTableUser(db)
@@ -133,4 +164,6 @@ func CreateTable(db *sql.DB) {
 	CreateTableUserLikedPosts(db)
 	CreateTableComments(db)
 	CreateTableUserLikedComments(db)
+	CreateTablePostReported(db)
+	CreateTableCommentReported(db)
 }

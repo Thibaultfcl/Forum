@@ -34,6 +34,7 @@ type PostData struct {
 	AuthorPicture   string
 	TimePosted      string
 	Liked           bool
+	Reported        bool
 	NbofLikes       int
 	NbofComments    int
 	UserIsAdmin     bool
@@ -272,6 +273,7 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 
 		if token == "" {
 			post.Liked = false
+			post.Reported = false
 		} else {
 			row := db.QueryRow("SELECT id, isAdmin, isModerator FROM users WHERE UUID=?", token)
 			err := row.Scan(&post.UserID, &post.UserIsAdmin, &post.UserIsModerator)
@@ -291,6 +293,18 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 				}
 			} else {
 				post.Liked = true
+			}
+			row = db.QueryRow("SELECT post_id FROM posts_reported WHERE post_id = ?", post.PostID)
+			err = row.Scan(&postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					post.Reported = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return nil
+				}
+			} else {
+				post.Reported = true
 			}
 		}
 
@@ -420,6 +434,7 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 
 		if token == "" {
 			post.Liked = false
+			post.Reported = false
 		} else {
 			row := db.QueryRow("SELECT id, isAdmin, isModerator FROM users WHERE UUID=?", token)
 			err := row.Scan(&post.UserID, &post.UserIsAdmin, &post.UserIsModerator)
@@ -439,6 +454,18 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 				}
 			} else {
 				post.Liked = true
+			}
+			row = db.QueryRow("SELECT post_id FROM posts_reported WHERE post_id = ?", post.PostID)
+			err = row.Scan(&postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					post.Reported = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return nil
+				}
+			} else {
+				post.Reported = true
 			}
 		}
 
@@ -568,6 +595,7 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 
 		if token == "" {
 			post.Liked = false
+			post.Reported = false
 		} else {
 			row := db.QueryRow("SELECT id, isAdmin, isModerator FROM users WHERE UUID=?", token)
 			err := row.Scan(&post.UserID, &post.UserIsAdmin, &post.UserIsModerator)
@@ -587,6 +615,18 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 				}
 			} else {
 				post.Liked = true
+			}
+			row = db.QueryRow("SELECT post_id FROM posts_reported WHERE post_id = ?", post.PostID)
+			err = row.Scan(&postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					post.Reported = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return nil
+				}
+			} else {
+				post.Reported = true
 			}
 		}
 
@@ -711,6 +751,7 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 
 	if token == "" {
 		post.Liked = false
+		post.Reported = false
 	} else {
 		row := db.QueryRow("SELECT id, isAdmin, isModerator FROM users WHERE UUID=?", token)
 		err := row.Scan(&post.UserID, &post.UserIsAdmin, &post.UserIsModerator)
@@ -731,6 +772,18 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 		} else {
 			post.Liked = true
 		}
+		row = db.QueryRow("SELECT post_id FROM posts_reported WHERE post_id = ?", post.PostID)
+			err = row.Scan(&postID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					post.Reported = false
+				} else {
+					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+					return PostData{}
+				}
+			} else {
+				post.Reported = true
+			}
 	}
 
 	row = db.QueryRow("SELECT COUNT(*) FROM user_liked_posts WHERE post_id=?", post.PostID)
