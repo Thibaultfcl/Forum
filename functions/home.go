@@ -45,6 +45,9 @@ func Home(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			return
 		}
 	}
+	if user.IsBanned {
+		http.Redirect(w, r, "/ban", redirect)
+	}
 
 	for i := range posts {
 		posts[i].IsLoggedIn = true

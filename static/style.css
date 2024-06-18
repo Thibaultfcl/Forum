@@ -1061,8 +1061,14 @@ a {
     scale: 0.7;
 }
 
+.bin-report{
+    display: flex;
+    justify-content: center;
+}
+
 .bin-button,
-.bin-button-comment {
+.bin-button-comment,
+.bin-button-report {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1087,17 +1093,20 @@ a {
 }
 
 .bin-button:hover .bin-top,
-.bin-button-comment:hover .bin-top {
+.bin-button-comment:hover .bin-top,
+.bin-button-report:hover .bin-top {
     transform: rotate(45deg);
 }
 
 .bin-button:hover
-.bin-button-comment:hover {
+.bin-button-comment:hover,
+.bin-button-report:hover {
     background-color: #701212;
 }
 
 .bin-button:active
-.bin-button-comment:active {
+.bin-button-comment:active,
+.bin-button-report:active {
     transform: scale(0.9);
 }
 
@@ -1251,4 +1260,89 @@ th {
     position: relative;
     opacity: 0;
     cursor: pointer;
+}
+
+.filter {
+    position: relative;
+    top: 80px;
+    left: 3%;
+    width: 75%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.filter select {
+    width: 200px;
+    height: 40px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.filter select option {
+    padding: 10px;
+}
+
+.checkPost{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cssbuttons-io-button {
+    background: #701212;
+    color: #fff;
+    font-family: inherit;
+    padding: 0.35em;
+    padding-left: 1.2em;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 0.9em;
+    border: none;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 0 1.6em -0.6em #c52726;
+    overflow: hidden;
+    position: relative;
+    height: 2.8em;
+    padding-right: 3.3em;
+    cursor: pointer;
+}
+
+.cssbuttons-io-button .icon {
+    background: #fff;
+    margin-left: 1em;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.2em;
+    width: 2.2em;
+    border-radius: 0.7em;
+    box-shadow: 0.1em 0.1em 0.6em 0.2em #c52726;
+    right: 0.3em;
+    transition: all 0.3s;
+}
+
+.cssbuttons-io-button:hover .icon {
+    width: calc(100% - 0.6em);
+}
+
+.cssbuttons-io-button .icon svg {
+    width: 1.1em;
+    transition: transform 0.3s;
+    color: #c52726;
+}
+
+.cssbuttons-io-button:hover .icon svg {
+    transform: translateX(0.1em);
+}
+
+.cssbuttons-io-button:active .icon {
+    transform: scale(0.95);
 }

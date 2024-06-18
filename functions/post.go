@@ -76,6 +76,10 @@ func Post(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			return
 		}
 	}
+	if isBanned {
+		http.Redirect(w, r, "/ban", redirect)
+	}
+
 	post.IsLoggedIn = true
 	for i := range comments {
 		comments[i].IsLoggedIn = true

@@ -16,6 +16,7 @@ type AdminData struct {
 	UserID             int
 	ProfilePicture     string
 	Users              []UserTable
+	Report             []Report
 	Categories         []CategoryData
 	CategoriesFollowed []CategoryData
 }
@@ -110,10 +111,8 @@ func Admin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	//get the categories
-	categories := getCategoriesByNumberOfPost(w, db)
-	categoriesFollowed := getCategoriesFollowed(w, db, token)
-	adminData.Categories = categories
-	adminData.CategoriesFollowed = categoriesFollowed
+	adminData.Categories = getCategoriesByNumberOfPost(w, db)
+	adminData.CategoriesFollowed = getCategoriesFollowed(w, db, token)
 
 	//get the users
 	users := []UserTable{}
@@ -136,6 +135,9 @@ func Admin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		users = append(users, user)
 	}
 	adminData.Users = users
+
+	//get the reported posts
+	adminData.Report = getReport(w, db)
 
 	// create the template
 	tmpl, err := template.ParseFiles("tmpl/admin.html")

@@ -65,6 +65,9 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 			return
 		}
 	}
+	if isBanned {
+		http.Redirect(w, r, "/ban", redirect)
+	}
 
 	for i := range posts {
 		posts[i].IsLoggedIn = true

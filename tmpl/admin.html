@@ -136,45 +136,136 @@
       </ol>
     </div>
 
+    <!-- filter -->
+    <div class="filter">
+      <select id="tableSelect" onchange="displayTable()">
+        <option value="admin">Admin Panel</option>
+        <option value="report">Report</option>
+      </select>
+    </div>
+
     <!-- admin -->
-    <table>
-      <thead>
-          <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Is Admin</th>
-              <th>Is Moderator</th>
-              <th>Is Banned</th>
-              <th>Profile Picture</th>
-          </tr>
-      </thead>
-      <tbody>
-          {{range .Users}}
-          <tr>
-              <td>{{.ID}}</td>
-              <td>{{.Username}}</td>
-              <td>
-                  <button class="button {{if .IsAdmin}}true{{else}}false{{end}} admin" data-user-id="{{.ID}}">
-                      {{if .IsAdmin}}True{{else}}False{{end}}
-                  </button>
-              </td>
-              <td>
-                  <button class="button {{if .IsModerator}}true{{else}}false{{end}} moderator" data-user-id="{{.ID}}">
-                      {{if .IsModerator}}True{{else}}False{{end}}
-                  </button>
-              <td>
-                  <button class="button {{if .IsBanned}}true{{else}}false{{end}} ban" data-user-id="{{.ID}}">
-                      {{if .IsBanned}}True{{else}}False{{end}}
-                  </button>
-              </td>
-              <td class="reset">
-                <img src="data:image/jpeg;base64,{{.ProfilePicture}}" width="50">
-                <button class="button reset-button" data-user-id="{{.ID}}">Reset</button>
-              </td>
-          </tr>
-          {{end}}
-      </tbody>
-    </table>
+    <div id="adminTable" style="display: none;">
+      <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Is Admin</th>
+                <th>Is Moderator</th>
+                <th>Is Banned</th>
+                <th>Profile Picture</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Users}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Username}}</td>
+                <td>
+                    <button class="button {{if .IsAdmin}}true{{else}}false{{end}} admin" data-user-id="{{.ID}}">
+                        {{if .IsAdmin}}True{{else}}False{{end}}
+                    </button>
+                </td>
+                <td>
+                    <button class="button {{if .IsModerator}}true{{else}}false{{end}} moderator" data-user-id="{{.ID}}">
+                        {{if .IsModerator}}True{{else}}False{{end}}
+                    </button>
+                <td>
+                    <button class="button {{if .IsBanned}}true{{else}}false{{end}} ban" data-user-id="{{.ID}}">
+                        {{if .IsBanned}}True{{else}}False{{end}}
+                    </button>
+                </td>
+                <td class="reset">
+                  <img src="data:image/jpeg;base64,{{.ProfilePicture}}" width="50">
+                  <button class="button reset-button" data-user-id="{{.ID}}">Reset</button>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- report -->
+    <div id="reportTable" style="display: none;">
+      <table>
+        <thead>
+            <tr>
+                <th>Moderator</th>
+                <th>Check the post</th>
+                <th>Delete the report</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Report}}
+            <tr>
+                <td>{{.Modo}}</td>
+                <td>
+                  <form action="/post/{{.ID}}" class="checkPost">
+                    <button class="cssbuttons-io-button">
+                      The post
+                      <div class="icon">
+                        <svg
+                          height="24"
+                          width="24"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path
+                            d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </div>
+                    </button>
+                  </form>
+                <td>
+                  <div class="bin-report">
+                    <button class="bin-button-report" data-post-id="{{.ID}}">
+                      <svg
+                        class="bin-top"
+                        viewBox="0 0 39 7"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                        <line
+                          x1="12"
+                          y1="1.5"
+                          x2="26.0357"
+                          y2="1.5"
+                          stroke="white"
+                          stroke-width="3"
+                        ></line>
+                      </svg>
+                      <svg
+                        class="bin-bottom"
+                        viewBox="0 0 33 39"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <mask id="path-1-inside-1_8_19" fill="white">
+                          <path
+                            d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
+                          ></path>
+                        </mask>
+                        <path
+                          d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                          fill="white"
+                          mask="url(#path-1-inside-1_8_19)"
+                        ></path>
+                        <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                        <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+      </table>
+    </div>
 
     <footer></footer>
 
