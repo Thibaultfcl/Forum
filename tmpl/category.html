@@ -101,14 +101,6 @@
         <div class="form-container sign-up-container">
           <form action="/signup" method="post">
             <h1>Create Account</h1>
-            <div class="social-container">
-              <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-              <a href="#" class="social"
-                ><i class="fab fa-google-plus-g"></i
-              ></a>
-              <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-            <span class="social-text">or use your email for registration</span>
             <input
               type="text"
               id="username"
@@ -139,14 +131,6 @@
         <div class="form-container sign-in-container">
           <form action="/signin" method="post">
             <h1>Sign in</h1>
-            <div class="social-container">
-              <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-              <a href="#" class="social"
-                ><i class="fab fa-google-plus-g"></i
-              ></a>
-              <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-            <span class="social-text">or use your account</span>
             <input
               type="email"
               id="emailSignin"
@@ -163,7 +147,6 @@
               required
               autocomplete="off"
             />
-            <a href="#">Forgot your password?</a>
             <button>Sign In</button>
           </form>
         </div>
@@ -287,9 +270,11 @@
           <p class="title">{{.Title}} :</p>
           <p>{{.Content}}</p>
         </main>
-        <div class="imageSection">
-          <img class="postImage" src="data:image/jpeg;base64,{{.Image}}">
-        </div>
+        {{if .HaveImage}}
+          <div class="imageSection">
+            <img class="postImage" src="data:image/jpeg;base64,{{.Image}}">
+          </div>
+        {{end}}
         <section>
           {{if .IsLoggedIn}}
           <div class="heart-container" title="Like">

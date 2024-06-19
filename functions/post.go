@@ -44,6 +44,7 @@ type PostData struct {
 	UserID          int
 	PostID          int
 	IsLoggedIn      bool
+	HaveImage       bool
 }
 
 // post page
@@ -260,7 +261,12 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		post.Image = base64.StdEncoding.EncodeToString(image)
+		if image == nil {
+			post.HaveImage = false
+		} else {
+			post.HaveImage = true
+			post.Image = base64.StdEncoding.EncodeToString(image)
+		}
 
 		var authorPP []byte
 		var authorIsBanned bool
@@ -423,7 +429,12 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		post.Image = base64.StdEncoding.EncodeToString(image)
+		if image == nil {
+			post.HaveImage = false
+		} else {
+			post.HaveImage = true
+			post.Image = base64.StdEncoding.EncodeToString(image)
+		}
 
 		var authorPP []byte
 		var authorIsBanned bool
@@ -586,7 +597,12 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		post.Image = base64.StdEncoding.EncodeToString(image)
+		if image == nil {
+			post.HaveImage = false
+		} else {
+			post.HaveImage = true
+			post.Image = base64.StdEncoding.EncodeToString(image)
+		}
 
 		var authorPP []byte
 		var authorIsBanned bool
@@ -744,7 +760,12 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return PostData{}
 	}
-	post.Image = base64.StdEncoding.EncodeToString(image)
+	if image == nil {
+		post.HaveImage = false
+	} else {
+		post.HaveImage = true
+		post.Image = base64.StdEncoding.EncodeToString(image)
+	}
 
 	var authorPP []byte
 	var authorIsBanned bool
@@ -915,7 +936,12 @@ func getMostLikedPosts(w http.ResponseWriter, db *sql.DB, token string) []PostDa
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		post.Image = base64.StdEncoding.EncodeToString(image)
+		if image == nil {
+			post.HaveImage = false
+		} else {
+			post.HaveImage = true
+			post.Image = base64.StdEncoding.EncodeToString(image)
+		}
 
 		var authorPP []byte
 		var authorIsBanned bool

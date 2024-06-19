@@ -312,6 +312,11 @@ a {
     .trend {
         display: none;
     }
+    .card {
+        top: 80px;
+        left: 5%;
+        max-width: 90%;
+    }
 }
 
 .trend {
@@ -366,7 +371,7 @@ a {
     position: relative;
     top: 120px;
     left: 5%;
-    max-width: 960px;
+    max-width: 65%;
     border-radius: 20px;
     background: #212121;
     overflow: hidden;
@@ -1474,4 +1479,16 @@ input[type=file]::file-selector-button:hover {
 
 .imageSection img {
     width: 400px;
+    border-radius: 15px;
+}
+
+footer {
+    position: relative;
+    top: 100px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
 }
