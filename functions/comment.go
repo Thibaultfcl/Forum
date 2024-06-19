@@ -15,7 +15,6 @@ type CommentData struct {
 	AuthorPicture   string
 	TimePosted      string
 	Liked           bool
-	Reported        bool
 	NbofLikes       int
 	UserIsAdmin     bool
 	UserIsModerator bool
@@ -132,7 +131,6 @@ func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []
 		var user_id int
 		if token == "" {
 			comment.Liked = false
-			comment.Reported = false
 		} else {
 			row := db.QueryRow("SELECT id, isAdmin, isModerator FROM users WHERE UUID=?", token)
 			err = row.Scan(&user_id, &comment.UserIsAdmin, &comment.UserIsModerator)
@@ -152,18 +150,6 @@ func getComments(w http.ResponseWriter, db *sql.DB, postID int, token string) []
 				}
 			} else {
 				comment.Liked = true
-			}
-			row = db.QueryRow("SELECT comment_id FROM comments_reported WHERE comment_id = ?", comment.CommentID)
-			err = row.Scan(&commentID)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					comment.Reported = false
-				} else {
-					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-					return nil
-				}
-			} else {
-				comment.Reported = true
 			}
 		}
 

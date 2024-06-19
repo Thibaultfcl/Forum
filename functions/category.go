@@ -44,7 +44,7 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	}
 
 	posts := getPostsFromCategory(w, db, categoryID, token)
-	category := getCategoryById(w, db, categoryID)
+	category := getCategoryById(w, r, db, categoryID)
 	categories := getCategoriesByNumberOfPost(w, db)
 	allCategories := getAllCategories(w, db)
 	categoriesFollowed := getCategoriesFollowed(w, db, token)
@@ -95,8 +95,8 @@ func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	serveCategoryPage(w, id, true, true, profilePicture, isAdmin, isBanned, categories, categoriesFollowed, allCategories, posts, category)
 }
 
-func serveCategoryPage(w http.ResponseWriter, userID int, isLoggedIn bool, userLiked bool, pp string, isAdmin bool, isBanned bool, categories []CategoryData, categoriesFollowed []CategoryData, allCategories []CategoryData, posts []PostData, category []CategoryData) {
-	userData := CategoryPageData{Id: userID, IsLoggedIn: isLoggedIn, UserLiked: userLiked, ProfilePicture: pp, IsAdmin: isAdmin, IsBanned: isBanned, Categories: categories, CategoriesFollowed: categoriesFollowed, AllCategories: allCategories, Posts: posts, Category: category[0]}
+func serveCategoryPage(w http.ResponseWriter, userID int, isLoggedIn bool, userLiked bool, pp string, isAdmin bool, isBanned bool, categories []CategoryData, categoriesFollowed []CategoryData, allCategories []CategoryData, posts []PostData, category CategoryData) {
+	userData := CategoryPageData{Id: userID, IsLoggedIn: isLoggedIn, UserLiked: userLiked, ProfilePicture: pp, IsAdmin: isAdmin, IsBanned: isBanned, Categories: categories, CategoriesFollowed: categoriesFollowed, AllCategories: allCategories, Posts: posts, Category: category}
 	tmpl, err := template.ParseFiles("tmpl/category.html")
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
@@ -109,49 +109,163 @@ func serveCategoryPage(w http.ResponseWriter, userID int, isLoggedIn bool, userL
 
 func getCategoriesByNumberOfPost(w http.ResponseWriter, db *sql.DB) []CategoryData {
 	var categories []CategoryData
-	rows, _ := db.Query("SELECT id, name, number_of_posts FROM categories ORDER BY number_of_posts DESC LIMIT 5")
+	rows, err := db.Query(`
+        SELECT c.id, c.name, COUNT(p.id) as post_count
+        FROM categories c
+        LEFT JOIN posts p ON p.category = c.id
+        GROUP BY c.id, c.name
+        ORDER BY post_count DESC
+        LIMIT 5
+    `)
+	if err != nil {
+        http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+        return nil
+    }
+    defer rows.Close()
+
 	for rows.Next() {
-		var id int
-		var categoryName string
-		var categoryNbofP int
-		err := rows.Scan(&id, &categoryName, &categoryNbofP)
+		var category CategoryData
+		err := rows.Scan(&category.Id, &category.Name, &category.NbofP)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		categories = append(categories, CategoryData{Id: id, Name: categoryName, NbofP: categoryNbofP})
+		rows, err := db.Query("SELECT author FROM posts WHERE category=?", category.Id)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		var userID int
+		var bannedUsers int
+		for rows.Next() {
+			err := rows.Scan(&userID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row := db.QueryRow("SELECT isBanned FROM users WHERE id=?", userID)
+			var isBanned bool
+			err = row.Scan(&isBanned)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			if isBanned {
+				bannedUsers++
+			}
+		}
+		category.NbofP -= bannedUsers
+		if category.NbofP <= 0 {
+			continue
+		}
+		
+		categories = append(categories, category)
 	}
 	return categories
 }
 
 func getAllCategories(w http.ResponseWriter, db *sql.DB) []CategoryData {
 	var categories []CategoryData
-	rows, _ := db.Query("SELECT id, name, number_of_posts FROM categories ORDER BY number_of_posts DESC")
+	rows, err := db.Query(`
+        SELECT c.id, c.name, COUNT(p.id) as post_count
+        FROM categories c
+        LEFT JOIN posts p ON p.category = c.id
+        GROUP BY c.id, c.name
+        ORDER BY post_count DESC
+    `)
+	if err != nil {
+        http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+        return nil
+    }
+    defer rows.Close()
+
 	for rows.Next() {
-		var id int
-		var categoryName string
-		var categoryNbofP int
-		err := rows.Scan(&id, &categoryName, &categoryNbofP)
+		var category CategoryData
+		err := rows.Scan(&category.Id, &category.Name, &category.NbofP)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		categories = append(categories, CategoryData{Id: id, Name: categoryName, NbofP: categoryNbofP})
+		rows, err := db.Query("SELECT author FROM posts WHERE category=?", category.Id)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return nil
+		}
+		var userID int
+		var bannedUsers int
+		for rows.Next() {
+			err := rows.Scan(&userID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row := db.QueryRow("SELECT isBanned FROM users WHERE id=?", userID)
+			var isBanned bool
+			err = row.Scan(&isBanned)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			if isBanned {
+				bannedUsers++
+			}
+		}
+		category.NbofP -= bannedUsers
+		if category.NbofP <= 0 {
+			continue
+		}
+		
+		categories = append(categories, category)
 	}
 	return categories
 }
 
-func getCategoryById(w http.ResponseWriter, db *sql.DB, id int) []CategoryData {
-	var category []CategoryData
-	row := db.QueryRow("SELECT name, number_of_posts FROM categories WHERE id=?", id)
-	var name string
-	var nbofP int
-	err := row.Scan(&name, &nbofP)
+func getCategoryById(w http.ResponseWriter, r *http.Request, db *sql.DB, id int) CategoryData {
+	var category CategoryData
+	row := db.QueryRow(`
+        SELECT c.id, c.name, COUNT(p.id) as post_count
+        FROM categories c
+        LEFT JOIN posts p ON p.category = c.id
+        WHERE c.id = ?
+        GROUP BY c.id, c.name
+    `, id)
+	err := row.Scan(&category.Id, &category.Name, &category.NbofP)
+	if err != nil {
+		if err == sql.ErrNoRows {
+            http.Error(w, "Category not found", http.StatusNotFound)
+            return CategoryData{}
+        }
+		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+		return CategoryData{}
+	}
+	rows, err := db.Query("SELECT author FROM posts WHERE category=?", category.Id)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-		return nil
+		return CategoryData{}
 	}
-	category = append(category, CategoryData{Id: id, Name: name, NbofP: nbofP})
+	var userID int
+	var bannedUsers int
+	for rows.Next() {
+		err := rows.Scan(&userID)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return CategoryData{}
+		}
+		row := db.QueryRow("SELECT isBanned FROM users WHERE id=?", userID)
+		var isBanned bool
+		err = row.Scan(&isBanned)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+			return CategoryData{}
+		}
+		if isBanned {
+			bannedUsers++
+		}
+	}
+	category.NbofP -= bannedUsers
+	if category.NbofP <= 0 {
+		http.Redirect(w, r, "/home", redirect)
+	}
 	return category
 }
 
@@ -160,6 +274,7 @@ func getCategoriesFollowed(w http.ResponseWriter, db *sql.DB, token string) []Ca
 	if token == "" {
 		return categories
 	}
+
 	row := db.QueryRow("SELECT id FROM users WHERE UUID=?", token)
 	var id int
 	err := row.Scan(&id)
@@ -167,27 +282,55 @@ func getCategoriesFollowed(w http.ResponseWriter, db *sql.DB, token string) []Ca
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return nil
 	}
-	rows, err := db.Query("SELECT category_id FROM user_liked_categories WHERE user_id=?", id)
+
+	rows, err := db.Query(`
+        SELECT c.id, c.name, COUNT(p.id) as post_count
+        FROM categories c
+        JOIN user_liked_categories ulc ON ulc.category_id = c.id
+        LEFT JOIN posts p ON p.category = c.id
+        WHERE ulc.user_id = ?
+        GROUP BY c.id, c.name
+    `, id)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return nil
 	}
 	for rows.Next() {
-		var categoryID int
-		err := rows.Scan(&categoryID)
+		var category CategoryData
+		err := rows.Scan(&category.Id, &category.Name, &category.NbofP)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		row := db.QueryRow("SELECT name, number_of_posts FROM categories WHERE id=?", categoryID)
-		var name string
-		var nbofP int
-		err = row.Scan(&name, &nbofP)
+		rows, err := db.Query("SELECT author FROM posts WHERE category=?", category.Id)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
-		categories = append(categories, CategoryData{Id: categoryID, Name: name, NbofP: nbofP})
+		var userID int
+		var bannedUsers int
+		for rows.Next() {
+			err := rows.Scan(&userID)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			row := db.QueryRow("SELECT isBanned FROM users WHERE id=?", userID)
+			var isBanned bool
+			err = row.Scan(&isBanned)
+			if err != nil {
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return nil
+			}
+			if isBanned {
+				bannedUsers++
+			}
+		}
+		category.NbofP -= bannedUsers
+		if category.NbofP <= 0 {
+			continue
+		}
+		categories = append(categories, category)
 	}
 	return categories
 }
