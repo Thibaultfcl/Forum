@@ -34,7 +34,6 @@ type UserPage struct {
 // user page
 func User(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
-	fmt.Println("token: ", token)
 
 	userIDStr := r.URL.Path[6:]
 	userID, err := strconv.Atoi(userIDStr)

@@ -77,7 +77,6 @@ func CreateAdminAccount(db *sql.DB) error {
 
 func Admin(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
-	fmt.Println("token: ", token)
 
 	//check if the user is logged in
 	if token == "" {

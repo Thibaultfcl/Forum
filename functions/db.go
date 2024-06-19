@@ -29,8 +29,7 @@ func CreateTableCategories(db *sql.DB) {
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS categories (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name VARCHAR(100) NOT NULL UNIQUE,
-			number_of_posts INTEGER DEFAULT 0
+			name VARCHAR(100) NOT NULL UNIQUE
 		)
 	`)
 	if err != nil {

@@ -32,7 +32,6 @@ type CategoryData struct {
 // category page
 func Category(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	token := GetSessionToken(r)
-	fmt.Println("token: ", token)
 
 	categoryName := r.URL.Path[10:]
 	row := db.QueryRow("SELECT id FROM categories WHERE name=?", categoryName)

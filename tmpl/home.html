@@ -204,9 +204,133 @@
       </ol>
     </div>
 
-    <!-- post card -->
-    {{range .Posts}}
-    <a href="/post/{{.PostID}}">
+    <!-- filter -->
+    <div class="radio-input">
+      <label class="labelRadio">
+        <input value="recent" name="value-radio" checked="" id="recent" type="radio" />
+        <p class="textRadio">Most recent posts</p>
+      </label>
+      <label class="labelRadio">
+        <input value="like" name="value-radio" id="like" type="radio" />
+        <p class="textRadio">Most liked posts</p>
+      </label>
+    </div>
+
+    <!-- most recent post -->
+    <div id="recentPost">
+      {{range .Posts}}
+      <a href="/post/{{.PostID}}">
+        <div class="card">
+          <header class="user">
+            <div class="userInfo">
+              <img class="ppUser" src="data:image/jpeg;base64,{{.AuthorPicture}}" data-user-id="{{.AuthorID}}"/>
+              <div class="user-info">
+                <h2 class="user-info-name">{{.Author}}</h2>
+                <p class="user-info-time">{{.TimePosted}}</p>
+              </div>
+            </div>
+            <div class="headerTitle">
+              <p>{{.Category}}</p>
+            </div>
+            <div>
+              {{if .UserIsAdmin}}
+              <div class="bin">
+                <button class="bin-button" data-post-id="{{.PostID}}" data-category-id="{{.CategoryID}}">
+                  <svg
+                    class="bin-top"
+                    viewBox="0 0 39 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                    <line
+                      x1="12"
+                      y1="1.5"
+                      x2="26.0357"
+                      y2="1.5"
+                      stroke="white"
+                      stroke-width="3"
+                    ></line>
+                  </svg>
+                  <svg
+                    class="bin-bottom"
+                    viewBox="0 0 33 39"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <mask id="path-1-inside-1_8_19" fill="white">
+                      <path
+                        d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"
+                      ></path>
+                    </mask>
+                    <path
+                      d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z"
+                      fill="white"
+                      mask="url(#path-1-inside-1_8_19)"
+                    ></path>
+                    <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                    <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                  </svg>
+                </button>
+              </div>
+              {{else if .UserIsModerator}}
+              <div class="modo">
+                <label class="container">
+                  <input class="report" type="checkbox" {{if .Reported}}checked{{end}} data-user-id="{{.UserID}}" data-post-id="{{.PostID}}">
+                  <svg viewBox="0 0 448 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="flag-regular"><path d="M48 24C48 10.7 37.3 0 24 0S0 10.7 0 24V64 350.5 400v88c0 13.3 10.7 24 24 24s24-10.7 24-24V388l80.3-20.1c41.1-10.3 84.6-5.5 122.5 13.4c44.2 22.1 95.5 24.8 141.7 7.4l34.7-13c12.5-4.7 20.8-16.6 20.8-30V66.1c0-23-24.2-38-44.8-27.7l-9.6 4.8c-46.3 23.2-100.8 23.2-147.1 0c-35.1-17.6-75.4-22-113.5-12.5L48 52V24zm0 77.5l96.6-24.2c27-6.7 55.5-3.6 80.4 8.8c54.9 27.4 118.7 29.7 175 6.8V334.7l-24.4 9.1c-33.7 12.6-71.2 10.7-103.4-5.4c-48.2-24.1-103.3-30.1-155.6-17.1L48 338.5v-237z"></path></svg>
+                  <svg viewBox="0 0 448 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="flag-solid"><path d="M64 32C64 14.3 49.7 0 32 0S0 14.3 0 32V64 368 480c0 17.7 14.3 32 32 32s32-14.3 32-32V352l64.3-16.1c41.1-10.3 84.6-5.5 122.5 13.4c44.2 22.1 95.5 24.8 141.7 7.4l34.7-13c12.5-4.7 20.8-16.6 20.8-30V66.1c0-23-24.2-38-44.8-27.7l-9.6 4.8c-46.3 23.2-100.8 23.2-147.1 0c-35.1-17.6-75.4-22-113.5-12.5L64 48V32z"></path></svg>
+                </label>
+              </div>
+              {{end}}
+            </div>
+          </header>
+          <main>
+            <p class="title">{{.Title}} :</p>
+            <p>{{.Content}}</p>
+          </main>
+          <section>
+            {{if .IsLoggedIn}}
+            <div class="heart-container" title="Like">
+              <input type="checkbox" class="checkbox" id="like_btn" {{if .Liked}}checked{{end}} data-user-id="{{.UserID}}" data-post-id="{{.PostID}}">
+              <div class="svg-container">
+                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z">
+                    </path>
+                </svg>
+                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z">
+                    </path>
+                </svg>
+                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="10,10 20,20"></polygon>
+                    <polygon points="10,50 20,50"></polygon>
+                    <polygon points="20,80 30,70"></polygon>
+                    <polygon points="90,10 80,20"></polygon>
+                    <polygon points="90,50 80,50"></polygon>
+                    <polygon points="80,80 70,70"></polygon>
+                </svg>
+              </div>
+            </div>
+            {{end}}
+            <p>{{.NbofLikes}} likes</p>
+            <p class="comment">{{.NbofComments}} comment</p>
+            {{if .IsLoggedIn}}
+              <button class="commentBtn">
+                <span class="IconContainer"> 
+                  <svg fill="white" viewBox="0 0 512 512" height="1em"><path d="M123.6 391.3c12.9-9.4 29.6-11.8 44.6-6.4c26.5 9.6 56.2 15.1 87.8 15.1c124.7 0 208-80.5 208-160s-83.3-160-208-160S48 160.5 48 240c0 32 12.4 62.8 35.7 89.2c8.6 9.7 12.8 22.5 11.8 35.5c-1.4 18.1-5.7 34.7-11.3 49.4c17-7.9 31.1-16.7 39.4-22.7zM21.2 431.9c1.8-2.7 3.5-5.4 5.1-8.1c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208s-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6c-15.1 6.6-32.3 12.6-50.1 16.1c-.8 .2-1.6 .3-2.4 .5c-4.4 .8-8.7 1.5-13.2 1.9c-.2 0-.5 .1-.7 .1c-5.1 .5-10.2 .8-15.3 .8c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c4.1-4.2 7.8-8.7 11.3-13.5c1.7-2.3 3.3-4.6 4.8-6.9c.1-.2 .2-.3 .3-.5z"></path></svg>
+                </span>
+              </button>
+            {{end}}
+          </section>
+        </div>
+      </a>
+      {{end}}
+    </div>
+
+    <!-- most liked post -->
+    <div id="mostLikedPost" style="display: none">
+      {{range .MostLikedPosts}}
+      <a href="/post/{{.PostID}}">
       <div class="card">
         <header class="user">
           <div class="userInfo">
@@ -310,8 +434,9 @@
           {{end}}
         </section>
       </div>
-    </a>
-    {{end}}
+      </a>
+      {{end}}
+    </div>
 
     {{if .IsLoggedIn}}
     <!-- post btn -->
@@ -401,5 +526,6 @@
     <script src="../script/search.js"></script>
     <script src="../script/postDelete.js"></script>
     <script src="../script/userPage.js"></script>
+    <script src="../script/filter.js"></script>
   </body>
 </html>
