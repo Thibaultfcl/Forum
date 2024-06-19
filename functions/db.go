@@ -48,6 +48,7 @@ func CreateTablePost(db *sql.DB) {
 			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			category INTEGER NOT NULL,
 			author INTEGER NOT NULL,
+			image BLOB,
 			FOREIGN KEY(category) REFERENCES categories(id),
 			FOREIGN KEY(author) REFERENCES users(id)
 		)

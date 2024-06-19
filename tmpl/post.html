@@ -273,6 +273,9 @@
         <p class="title">{{.Post.Title}} :</p>
         <p>{{.Post.Content}}</p>
       </main>
+      <div class="imageSection">
+        <img class="postImage" src="data:image/jpeg;base64,{{.Post.Image}}">
+      </div>
       <section>
         {{if .Post.IsLoggedIn}}
         <div class="heart-container" title="Like">

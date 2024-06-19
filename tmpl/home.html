@@ -288,6 +288,9 @@
             <p class="title">{{.Title}} :</p>
             <p>{{.Content}}</p>
           </main>
+          <div class="imageSection">
+            <img class="postImage" src="data:image/jpeg;base64,{{.Image}}">
+          </div>
           <section>
             {{if .IsLoggedIn}}
             <div class="heart-container" title="Like">
@@ -399,6 +402,9 @@
           <p class="title">{{.Title}} :</p>
           <p>{{.Content}}</p>
         </main>
+        <div class="imageSection">
+          <img class="postImage" src="data:image/jpeg;base64,{{.Image}}">
+        </div>
         <section>
           {{if .IsLoggedIn}}
           <div class="heart-container" title="Like">
@@ -450,7 +456,7 @@
 
     <!-- post form -->
     <div id="post-form" class="post-form" style="display: none">
-      <form action="/createPost" method="post">
+      <form action="/createPost" method="post" enctype="multipart/form-data">
         <div class="container">
           <div class="modal">
             <div class="modal__header">
@@ -506,6 +512,9 @@
                   Give your post a good description so everyone know what's it
                   for
                 </p>
+              </div>
+              <div class="input" style="display: flex; align-items: flex-end;">
+                <input type="file" id="File" name="File" accept=".jpg, .jpeg, .png">
               </div>
             </div>
             <div class="modal__footer">

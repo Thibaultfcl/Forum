@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -31,6 +32,7 @@ type PostData struct {
 	CategoryID      int
 	Author          string
 	AuthorID        int
+	Image           string
 	AuthorPicture   string
 	TimePosted      string
 	Liked           bool
@@ -125,10 +127,25 @@ func CreatePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	//we parse the form
+	err = r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error parsing form: %v", err), http.StatusInternalServerError)
+		return
+	}
+
 	//we get the title and the content
 	category := r.FormValue("Category")
 	title := r.FormValue("PostName")
 	content := r.FormValue("PostContent")
+	//we get the form values
+	file, _, err := r.FormFile("File")
+	if err != nil {
+		if err != http.ErrMissingFile {
+			http.Error(w, fmt.Sprintf("Error retrieving the file: %v", err), http.StatusInternalServerError)
+			return
+		}
+	}
 
 	tx, err := db.Begin()
 	if err != nil {
@@ -160,11 +177,19 @@ func CreatePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
-	// Increment the number of posts
-	_, err = tx.Exec("UPDATE categories SET number_of_posts = number_of_posts + 1 WHERE id=?", idCategory)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error while updating the number of posts: %v", err), http.StatusInternalServerError)
-		return
+	// add the image to the post
+	if file != nil {
+		defer file.Close()
+		fileBytes, err := io.ReadAll(file)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error reading the file: %v", err), http.StatusInternalServerError)
+			return
+		}
+		_, err = tx.Exec("UPDATE posts SET image=? WHERE title=? AND content=? AND category=? AND author=?", fileBytes, title, content, idCategory, id)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error updating the profile picture: %v", err), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	err = tx.Commit()
@@ -221,7 +246,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 	var posts []PostData
-	rows, err := db.Query(`SELECT id, title, content, date, category, author FROM posts ORDER BY date DESC`)
+	rows, err := db.Query(`SELECT id, title, content, date, category, author, image FROM posts ORDER BY date DESC`)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return posts
@@ -229,11 +254,13 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 	for rows.Next() {
 		var post PostData
 		var date string
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID)
+		var image []byte
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID, &image)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+		post.Image = base64.StdEncoding.EncodeToString(image)
 
 		var authorPP []byte
 		var authorIsBanned bool
@@ -382,7 +409,7 @@ func getPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 
 func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token string) []PostData {
 	var posts []PostData
-	rows, err := db.Query("SELECT id, title, content, date, category, author FROM posts WHERE author=? ORDER BY date DESC", authorID)
+	rows, err := db.Query("SELECT id, title, content, date, category, author, image FROM posts WHERE author=? ORDER BY date DESC", authorID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return posts
@@ -390,11 +417,13 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 	for rows.Next() {
 		var post PostData
 		var date string
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID)
+		var image []byte
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID, &image)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+		post.Image = base64.StdEncoding.EncodeToString(image)
 
 		var authorPP []byte
 		var authorIsBanned bool
@@ -543,7 +572,7 @@ func getPostsFromUser(w http.ResponseWriter, db *sql.DB, authorID int, token str
 
 func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, token string) []PostData {
 	var posts []PostData
-	rows, err := db.Query("SELECT id, title, content, date, category, author FROM posts WHERE category=? ORDER BY date DESC", categoryID)
+	rows, err := db.Query("SELECT id, title, content, date, category, author, image FROM posts WHERE category=? ORDER BY date DESC", categoryID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return posts
@@ -551,11 +580,13 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 	for rows.Next() {
 		var post PostData
 		var date string
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID)
+		var image []byte
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID, &image)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+		post.Image = base64.StdEncoding.EncodeToString(image)
 
 		var authorPP []byte
 		var authorIsBanned bool
@@ -704,14 +735,16 @@ func getPostsFromCategory(w http.ResponseWriter, db *sql.DB, categoryID int, tok
 
 func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostData {
 	var post PostData
-	row := db.QueryRow("SELECT title, content, date, category, author FROM posts WHERE id=? ORDER BY date DESC", id)
+	row := db.QueryRow("SELECT title, content, date, category, author, image FROM posts WHERE id=? ORDER BY date DESC", id)
 	post.PostID = id
 	var date string
-	err := row.Scan(&post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID)
+	var image []byte
+	err := row.Scan(&post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID, &image)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return PostData{}
 	}
+	post.Image = base64.StdEncoding.EncodeToString(image)
 
 	var authorPP []byte
 	var authorIsBanned bool
@@ -776,17 +809,17 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 			post.Liked = true
 		}
 		row = db.QueryRow("SELECT post_id FROM posts_reported WHERE post_id = ?", post.PostID)
-			err = row.Scan(&postID)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					post.Reported = false
-				} else {
-					http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
-					return PostData{}
-				}
+		err = row.Scan(&postID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				post.Reported = false
 			} else {
-				post.Reported = true
+				http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
+				return PostData{}
 			}
+		} else {
+			post.Reported = true
+		}
 	}
 
 	row = db.QueryRow("SELECT COUNT(*) FROM user_liked_posts WHERE post_id=?", post.PostID)
@@ -859,7 +892,7 @@ func getPostById(w http.ResponseWriter, db *sql.DB, id int, token string) PostDa
 func getMostLikedPosts(w http.ResponseWriter, db *sql.DB, token string) []PostData {
 	var posts []PostData
 	rows, err := db.Query(`
-	SELECT p.id, p.title, p.content, p.date, p.category, p.author, 
+	SELECT p.id, p.title, p.content, p.date, p.category, p.author, p.image,
 		COALESCE(l.like_count, 0) as like_count
 	FROM posts p
 	LEFT JOIN (
@@ -876,17 +909,19 @@ func getMostLikedPosts(w http.ResponseWriter, db *sql.DB, token string) []PostDa
 	for rows.Next() {
 		var post PostData
 		var date string
-		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID, &post.NbofLikes)
+		var image []byte
+		err := rows.Scan(&post.PostID, &post.Title, &post.Content, &date, &post.CategoryID, &post.AuthorID, &image, &post.NbofLikes)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
+		post.Image = base64.StdEncoding.EncodeToString(image)
 
 		var authorPP []byte
 		var authorIsBanned bool
 		row := db.QueryRow("SELECT name FROM categories WHERE id=?", post.CategoryID)
 		err = row.Scan(&post.Category)
-		if (err != nil) {
+		if err != nil {
 			http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 			return nil
 		}
