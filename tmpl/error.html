@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Forum</title>
+        <link rel="icon" href="../img/icon.jpg" />
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #c52726;
+                color: white;
+                font-family: Arial, sans-serif;
+                text-align: center;
+            }
+            h1 {
+                font-size: 5em;
+                text-transform: uppercase;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Error {{.ErrorCode}}</h1>
+        <p>{{.ErrorMessage}}</p>
+    </body>
+</html>
